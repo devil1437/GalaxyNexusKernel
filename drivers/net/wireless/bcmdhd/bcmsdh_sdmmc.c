@@ -41,6 +41,7 @@
 
 #include <dngl_stats.h>
 #include <dhd.h>
+#include <dhd_dbg.h>
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 27)) && defined(CONFIG_PM_SLEEP)
 #include <linux/suspend.h>
@@ -88,6 +89,8 @@ sdioh_sdmmc_card_enablefuncs(sdioh_info_t *sd)
 	uint32 fbraddr;
 	uint8 func;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sd_trace(("%s\n", __FUNCTION__));
 
 	/* Get the Card's common CIS address */
@@ -126,6 +129,7 @@ sdioh_attach(osl_t *osh, void *bar0, uint irq)
 	sdioh_info_t *sd;
 	int err_ret;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 	sd_trace(("%s\n", __FUNCTION__));
 
 	if (gInstance == NULL) {
@@ -190,6 +194,7 @@ sdioh_attach(osl_t *osh, void *bar0, uint irq)
 extern SDIOH_API_RC
 sdioh_detach(osl_t *osh, sdioh_info_t *sd)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 	sd_trace(("%s\n", __FUNCTION__));
 
 	if (sd) {
@@ -225,6 +230,8 @@ sdioh_enable_func_intr(void)
 	uint8 reg;
 	int err;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+	
 	if (gInstance->func[0]) {
 		sdio_claim_host(gInstance->func[0]);
 
@@ -256,6 +263,8 @@ sdioh_disable_func_intr(void)
 	uint8 reg;
 	int err;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+	
 	if (gInstance->func[0]) {
 		sdio_claim_host(gInstance->func[0]);
 		reg = sdio_readb(gInstance->func[0], SDIOD_CCCR_INTEN, &err);
@@ -285,6 +294,8 @@ sdioh_disable_func_intr(void)
 extern SDIOH_API_RC
 sdioh_interrupt_register(sdioh_info_t *sd, sdioh_cb_fn_t fn, void *argh)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+	
 	sd_trace(("%s: Entering\n", __FUNCTION__));
 	if (fn == NULL) {
 		sd_err(("%s: interrupt handler is NULL, not registering\n", __FUNCTION__));
@@ -317,6 +328,8 @@ sdioh_interrupt_register(sdioh_info_t *sd, sdioh_cb_fn_t fn, void *argh)
 extern SDIOH_API_RC
 sdioh_interrupt_deregister(sdioh_info_t *sd)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+	
 	sd_trace(("%s: Entering\n", __FUNCTION__));
 
 #if !defined(OOB_INTR_ONLY)
@@ -347,6 +360,8 @@ sdioh_interrupt_deregister(sdioh_info_t *sd)
 extern SDIOH_API_RC
 sdioh_interrupt_query(sdioh_info_t *sd, bool *onoff)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+	
 	sd_trace(("%s: Entering\n", __FUNCTION__));
 	*onoff = sd->client_intr_enabled;
 	return SDIOH_API_RC_SUCCESS;
@@ -356,6 +371,8 @@ sdioh_interrupt_query(sdioh_info_t *sd, bool *onoff)
 extern bool
 sdioh_interrupt_pending(sdioh_info_t *sd)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+	
 	return (0);
 }
 #endif
@@ -363,6 +380,8 @@ sdioh_interrupt_pending(sdioh_info_t *sd)
 uint
 sdioh_query_iofnum(sdioh_info_t *sd)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+	
 	return sd->num_funcs;
 }
 
@@ -422,6 +441,8 @@ sdioh_iovar_op(sdioh_info_t *si, const char *name,
 	/* Get must have return space; Set does not take qualifiers */
 	ASSERT(set || (arg && len));
 	ASSERT(!set || (!params && !plen));
+	
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	sd_trace(("%s: Enter (%s %s)\n", __FUNCTION__, (set ? "set" : "get"), name));
 
@@ -680,6 +701,8 @@ sdioh_enable_hw_oob_intr(sdioh_info_t *sd, bool enable)
 	SDIOH_API_RC status;
 	uint8 data;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (enable)
 		data = SDIO_SEPINT_MASK | SDIO_SEPINT_OE | SDIO_SEPINT_ACT_HI;
 	else
@@ -694,6 +717,9 @@ extern SDIOH_API_RC
 sdioh_cfg_read(sdioh_info_t *sd, uint fnc_num, uint32 addr, uint8 *data)
 {
 	SDIOH_API_RC status;
+	
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	/* No lock needed since sdioh_request_byte does locking */
 	status = sdioh_request_byte(sd, SDIOH_READ, fnc_num, addr, data);
 	return status;
@@ -704,6 +730,9 @@ sdioh_cfg_write(sdioh_info_t *sd, uint fnc_num, uint32 addr, uint8 *data)
 {
 	/* No lock needed since sdioh_request_byte does locking */
 	SDIOH_API_RC status;
+	
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	status = sdioh_request_byte(sd, SDIOH_WRITE, fnc_num, addr, data);
 	return status;
 }
@@ -715,6 +744,9 @@ sdioh_sdmmc_get_cisaddr(sdioh_info_t *sd, uint32 regaddr)
 	int i;
 	uint32 scratch, regdata;
 	uint8 *ptr = (uint8 *)&scratch;
+	
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	for (i = 0; i < 3; i++) {
 		if ((sdioh_sdmmc_card_regread (sd, 0, regaddr, 1, &regdata)) != SUCCESS)
 			sd_err(("%s: Can't read!\n", __FUNCTION__));
@@ -736,6 +768,8 @@ sdioh_cis_read(sdioh_info_t *sd, uint func, uint8 *cisd, uint32 length)
 	int offset;
 	uint32 foo;
 	uint8 *cis = cisd;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	sd_trace(("%s: Func = %d\n", __FUNCTION__, func));
 
@@ -765,6 +799,8 @@ extern SDIOH_API_RC
 sdioh_request_byte(sdioh_info_t *sd, uint rw, uint func, uint regaddr, uint8 *byte)
 {
 	int err_ret;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	sd_info(("%s: rw=%d, func=%d, addr=0x%05x\n", __FUNCTION__, rw, func, regaddr));
 
@@ -863,6 +899,8 @@ sdioh_request_word(sdioh_info_t *sd, uint cmd_type, uint rw, uint func, uint add
 		return SDIOH_API_RC_FAIL;
 	}
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sd_info(("%s: cmd_type=%d, rw=%d, func=%d, addr=0x%05x, nbytes=%d\n",
 	         __FUNCTION__, cmd_type, rw, func, addr, nbytes));
 
@@ -913,6 +951,8 @@ sdioh_request_packet(sdioh_info_t *sd, uint fix_inc, uint write, uint func,
 	struct mmc_request mmc_req;
 	struct mmc_command mmc_cmd;
 	struct mmc_data mmc_dat;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	sd_trace(("%s: Enter\n", __FUNCTION__));
 
@@ -1092,6 +1132,8 @@ sdioh_request_buffer(sdioh_info_t *sd, uint pio_dma, uint fix_inc, uint write, u
 	SDIOH_API_RC Status;
 	void *mypkt = NULL;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sd_trace(("%s: Enter\n", __FUNCTION__));
 
 	DHD_PM_RESUME_WAIT(sdioh_request_buffer_wait);
@@ -1180,6 +1222,8 @@ sdioh_abort(sdioh_info_t *sd, uint func)
 #if defined(MMC_SDIO_ABORT)
 	char t_func = (char) func;
 #endif /* defined(MMC_SDIO_ABORT) */
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sd_trace(("%s: Enter\n", __FUNCTION__));
 
 #if defined(MMC_SDIO_ABORT)
@@ -1194,6 +1238,8 @@ sdioh_abort(sdioh_info_t *sd, uint func)
 /* Reset and re-initialize the device */
 int sdioh_sdio_reset(sdioh_info_t *si)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sd_trace(("%s: Enter\n", __FUNCTION__));
 	sd_trace(("%s: Exit\n", __FUNCTION__));
 	return SDIOH_API_RC_SUCCESS;
@@ -1203,6 +1249,8 @@ int sdioh_sdio_reset(sdioh_info_t *si)
 void
 sdioh_sdmmc_devintr_off(sdioh_info_t *sd)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sd_trace(("%s: %d\n", __FUNCTION__, sd->use_client_ints));
 	sd->intmask &= ~CLIENT_INTR;
 }
@@ -1211,6 +1259,8 @@ sdioh_sdmmc_devintr_off(sdioh_info_t *sd)
 void
 sdioh_sdmmc_devintr_on(sdioh_info_t *sd)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sd_trace(("%s: %d\n", __FUNCTION__, sd->use_client_ints));
 	sd->intmask |= CLIENT_INTR;
 }
@@ -1219,6 +1269,7 @@ sdioh_sdmmc_devintr_on(sdioh_info_t *sd)
 int
 sdioh_sdmmc_card_regread(sdioh_info_t *sd, int func, uint32 regaddr, int regsize, uint32 *data)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if ((func == 0) || (regsize == 1)) {
 		uint8 temp = 0;
@@ -1246,6 +1297,8 @@ static void IRQHandler(struct sdio_func *func)
 {
 	sdioh_info_t *sd;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sd_trace(("bcmsdh_sdmmc: ***IRQHandler\n"));
 	sd = gInstance->sd;
 
@@ -1272,6 +1325,8 @@ static void IRQHandlerF2(struct sdio_func *func)
 {
 	sdioh_info_t *sd;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sd_trace(("bcmsdh_sdmmc: ***IRQHandlerF2\n"));
 
 	sd = gInstance->sd;
@@ -1286,6 +1341,8 @@ static void IRQHandlerF2(struct sdio_func *func)
 static int
 sdioh_sdmmc_card_regwrite(sdioh_info_t *sd, int func, uint32 regaddr, int regsize, uint32 data)
 {
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if ((func == 0) || (regsize == 1)) {
 		uint8 temp;
@@ -1318,6 +1375,8 @@ sdioh_start(sdioh_info_t *si, int stage)
 		downloading of the firmware is complete, other wise polling
 		sdio access will come in way
 	*/
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (gInstance->func[0]) {
 			if (stage == 0) {
 		/* Since the power to the chip is killed, we will have
@@ -1396,6 +1455,8 @@ sdioh_stop(sdioh_info_t *si)
 		unregister interrupt with SDIO stack to stop the
 		polling
 	*/
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (gInstance->func[0]) {
 #if !defined(OOB_INTR_ONLY)
 		sdio_claim_host(gInstance->func[0]);
@@ -1417,5 +1478,7 @@ sdioh_stop(sdioh_info_t *si)
 int
 sdioh_waitlockfree(sdioh_info_t *sd)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	return (1);
 }

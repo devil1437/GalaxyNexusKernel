@@ -54,6 +54,8 @@ dhd_bta_docmd(dhd_pub_t *pub, void *cmd_buf, uint cmd_len)
 	uint len = sizeof(buf);
 	wl_ioctl_t ioc;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (cmd_len < HCI_CMD_PREAMBLE_SIZE)
 		return BCME_BADLEN;
 
@@ -81,6 +83,8 @@ dhd_bta_flush_hcidata(dhd_pub_t *pub, uint16 llh)
 	int prec;
 	struct pktq *q;
 	uint count = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	q = dhd_bus_txq(pub->bus);
 	if (q == NULL)
@@ -149,6 +153,8 @@ _dhd_bta_docmd(dhd_pub_t *pub, amp_hci_cmd_t *cmd)
 {
 	int status = 0;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	switch (ltoh16_ua((uint8 *)&cmd->opcode)) {
 	case HCI_Enhanced_Flush: {
 		eflush_cmd_parms_t *cmdparms = (eflush_cmd_parms_t *)cmd->parms;
@@ -173,6 +179,8 @@ dhd_bta_docmd(dhd_pub_t *pub, void *cmd_buf, uint cmd_len)
 	uint len;
 	void *p;
 	int status;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (cmd_len < HCI_CMD_PREAMBLE_SIZE) {
 		DHD_ERROR(("dhd_bta_docmd: short command, cmd_len %u\n", cmd_len));
@@ -228,6 +236,8 @@ dhd_bta_tx_hcidata(dhd_pub_t *pub, void *data_buf, uint data_len)
 	uint len;
 	void *p;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (data_len < HCI_ACL_DATA_PREAMBLE_SIZE) {
 		DHD_ERROR(("dhd_bta_tx_hcidata: short data_buf, data_len %u\n", data_len));
 		return BCME_BADLEN;
@@ -279,6 +289,8 @@ dhd_bta_tx_hcidata_complete(dhd_pub_t *dhdp, void *txp, bool success)
 
 	uint16 len = HCI_EVT_PREAMBLE_SIZE + sizeof(num_completed_data_blocks_evt_parms_t);
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	/* update the event struct */
 	memset(&event, 0, sizeof(event));
 	event.version = hton16(BCM_EVENT_MSG_VERSION);
@@ -308,6 +320,8 @@ dhd_bta_tx_hcidata_complete(dhd_pub_t *dhdp, void *txp, bool success)
 void
 dhd_bta_doevt(dhd_pub_t *dhdp, void *data_buf, uint data_len)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	amp_hci_event_t *evt = (amp_hci_event_t *)data_buf;
 
 	switch (evt->ecode) {

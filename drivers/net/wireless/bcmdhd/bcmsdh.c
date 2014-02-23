@@ -38,6 +38,7 @@
 #include <hndsoc.h>
 #include <siutils.h>
 #include <osl.h>
+#include <dhd_dbg.h>
 
 #include <bcmsdh.h>	/* BRCM API for SDIO clients (such as wl, dhd) */
 #include <bcmsdbus.h>	/* common SDIO/controller interface */
@@ -70,6 +71,8 @@ sdioh_enable_hw_oob_intr(void *sdioh, bool enable);
 void
 bcmsdh_enable_hw_oob_intr(bcmsdh_info_t *sdh, bool enable)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	sdioh_enable_hw_oob_intr(sdh->sdioh, enable);
 }
 #endif
@@ -87,6 +90,8 @@ bcmsdh_info_t *
 bcmsdh_attach(osl_t *osh, void *cfghdl, void **regsva, uint irq)
 {
 	bcmsdh_info_t *bcmsdh;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 
 	if ((bcmsdh = (bcmsdh_info_t *)MALLOC(osh, sizeof(bcmsdh_info_t))) == NULL) {
 		BCMSDH_ERROR(("bcmsdh_attach: out of memory, malloced %d bytes\n", MALLOCED(osh)));
@@ -117,6 +122,8 @@ bcmsdh_detach(osl_t *osh, void *sdh)
 {
 	bcmsdh_info_t *bcmsdh = (bcmsdh_info_t *)sdh;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (bcmsdh != NULL) {
 		if (bcmsdh->sdioh) {
 			sdioh_detach(osh, bcmsdh->sdioh);
@@ -134,6 +141,8 @@ bcmsdh_iovar_op(void *sdh, const char *name,
                 void *params, int plen, void *arg, int len, bool set)
 {
 	bcmsdh_info_t *bcmsdh = (bcmsdh_info_t *)sdh;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return sdioh_iovar_op(bcmsdh->sdioh, name, params, plen, arg, len, set);
 }
 
@@ -143,6 +152,8 @@ bcmsdh_intr_query(void *sdh)
 	bcmsdh_info_t *bcmsdh = (bcmsdh_info_t *)sdh;
 	SDIOH_API_RC status;
 	bool on;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	ASSERT(bcmsdh);
 	status = sdioh_interrupt_query(bcmsdh->sdioh, &on);
@@ -159,6 +170,8 @@ bcmsdh_intr_enable(void *sdh)
 	SDIOH_API_RC status;
 	ASSERT(bcmsdh);
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	status = sdioh_interrupt_set(bcmsdh->sdioh, TRUE);
 	return (SDIOH_API_SUCCESS(status) ? 0 : BCME_ERROR);
 }
@@ -169,6 +182,8 @@ bcmsdh_intr_disable(void *sdh)
 	bcmsdh_info_t *bcmsdh = (bcmsdh_info_t *)sdh;
 	SDIOH_API_RC status;
 	ASSERT(bcmsdh);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	status = sdioh_interrupt_set(bcmsdh->sdioh, FALSE);
 	return (SDIOH_API_SUCCESS(status) ? 0 : BCME_ERROR);
@@ -181,6 +196,8 @@ bcmsdh_intr_reg(void *sdh, bcmsdh_cb_fn_t fn, void *argh)
 	SDIOH_API_RC status;
 	ASSERT(bcmsdh);
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	status = sdioh_interrupt_register(bcmsdh->sdioh, fn, argh);
 	return (SDIOH_API_SUCCESS(status) ? 0 : BCME_ERROR);
 }
@@ -192,6 +209,8 @@ bcmsdh_intr_dereg(void *sdh)
 	SDIOH_API_RC status;
 	ASSERT(bcmsdh);
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	status = sdioh_interrupt_deregister(bcmsdh->sdioh);
 	return (SDIOH_API_SUCCESS(status) ? 0 : BCME_ERROR);
 }
@@ -201,6 +220,8 @@ bool
 bcmsdh_intr_pending(void *sdh)
 {
 	bcmsdh_info_t *bcmsdh = (bcmsdh_info_t *)sdh;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	ASSERT(sdh);
 	return sdioh_interrupt_pending(bcmsdh->sdioh);
@@ -212,6 +233,8 @@ int
 bcmsdh_devremove_reg(void *sdh, bcmsdh_cb_fn_t fn, void *argh)
 {
 	ASSERT(sdh);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	/* don't support yet */
 	return BCME_UNSUPPORTED;
@@ -234,6 +257,8 @@ bcmsdh_cfg_read(void *sdh, uint fnc_num, uint32 addr, int *err)
 	int32 retry = 0;
 #endif
 	uint8 data = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!bcmsdh)
 		bcmsdh = l_bcmsdh;
@@ -267,6 +292,8 @@ bcmsdh_cfg_write(void *sdh, uint fnc_num, uint32 addr, uint8 data, int *err)
 	int32 retry = 0;
 #endif
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (!bcmsdh)
 		bcmsdh = l_bcmsdh;
 
@@ -295,6 +322,8 @@ bcmsdh_cfg_read_word(void *sdh, uint fnc_num, uint32 addr, int *err)
 	SDIOH_API_RC status;
 	uint32 data = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (!bcmsdh)
 		bcmsdh = l_bcmsdh;
 
@@ -317,6 +346,8 @@ bcmsdh_cfg_write_word(void *sdh, uint fnc_num, uint32 addr, uint32 data, int *er
 {
 	bcmsdh_info_t *bcmsdh = (bcmsdh_info_t *)sdh;
 	SDIOH_API_RC status;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!bcmsdh)
 		bcmsdh = l_bcmsdh;
@@ -344,6 +375,8 @@ bcmsdh_cis_read(void *sdh, uint func, uint8 *cis, uint length)
 	uint8 *ptr;
 	bool ascii = func & ~0xf;
 	func &= 0x7;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!bcmsdh)
 		bcmsdh = l_bcmsdh;
@@ -381,6 +414,8 @@ bcmsdhsdio_set_sbaddr_window(void *sdh, uint32 address, bool force_set)
 	uint bar0 = address & ~SBSDIO_SB_OFT_ADDR_MASK;
 	bcmsdh_info_t *bcmsdh = (bcmsdh_info_t *)sdh;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (bar0 != bcmsdh->sbwad || force_set) {
 		bcmsdh_cfg_write(bcmsdh, SDIO_FUNC_1, SBSDIO_FUNC1_SBADDRLOW,
 			(address >> 8) & SBSDIO_SBADDRLOW_MASK, &err);
@@ -408,6 +443,8 @@ bcmsdh_reg_read(void *sdh, uint32 addr, uint size)
 	bcmsdh_info_t *bcmsdh = (bcmsdh_info_t *)sdh;
 	SDIOH_API_RC status;
 	uint32 word = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	BCMSDH_INFO(("%s:fun = 1, addr = 0x%x, ", __FUNCTION__, addr));
 
@@ -457,6 +494,8 @@ bcmsdh_reg_write(void *sdh, uint32 addr, uint size, uint32 data)
 	SDIOH_API_RC status;
 	int err = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	BCMSDH_INFO(("%s:fun = 1, addr = 0x%x, uint%ddata = 0x%x\n",
 	             __FUNCTION__, addr, size*8, data));
 
@@ -486,6 +525,8 @@ bcmsdh_reg_write(void *sdh, uint32 addr, uint size, uint32 data)
 bool
 bcmsdh_regfail(void *sdh)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return ((bcmsdh_info_t *)sdh)->regfail;
 }
 
@@ -499,6 +540,8 @@ bcmsdh_recv_buf(void *sdh, uint32 addr, uint fn, uint flags,
 	uint incr_fix;
 	uint width;
 	int err = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	ASSERT(bcmsdh);
 	ASSERT(bcmsdh->init_success);
@@ -538,6 +581,8 @@ bcmsdh_send_buf(void *sdh, uint32 addr, uint fn, uint flags,
 	uint width;
 	int err = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	ASSERT(bcmsdh);
 	ASSERT(bcmsdh->init_success);
 
@@ -571,6 +616,8 @@ bcmsdh_rwdata(void *sdh, uint rw, uint32 addr, uint8 *buf, uint nbytes)
 	bcmsdh_info_t *bcmsdh = (bcmsdh_info_t *)sdh;
 	SDIOH_API_RC status;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	ASSERT(bcmsdh);
 	ASSERT(bcmsdh->init_success);
 	ASSERT((addr & SBSDIO_SBWINDOW_MASK) == 0);
@@ -590,6 +637,8 @@ bcmsdh_abort(void *sdh, uint fn)
 {
 	bcmsdh_info_t *bcmsdh = (bcmsdh_info_t *)sdh;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return sdioh_abort(bcmsdh->sdioh, fn);
 }
 
@@ -597,6 +646,8 @@ int
 bcmsdh_start(void *sdh, int stage)
 {
 	bcmsdh_info_t *bcmsdh = (bcmsdh_info_t *)sdh;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	return sdioh_start(bcmsdh->sdioh, stage);
 }
@@ -606,6 +657,8 @@ bcmsdh_stop(void *sdh)
 {
 	bcmsdh_info_t *bcmsdh = (bcmsdh_info_t *)sdh;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return sdioh_stop(bcmsdh->sdioh);
 }
 
@@ -613,6 +666,8 @@ int
 bcmsdh_waitlockfree(void *sdh)
 {
 	bcmsdh_info_t *bcmsdh = (bcmsdh_info_t *)sdh;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (!bcmsdh)
 		bcmsdh = l_bcmsdh;
 
@@ -624,6 +679,8 @@ int
 bcmsdh_query_device(void *sdh)
 {
 	bcmsdh_info_t *bcmsdh = (bcmsdh_info_t *)sdh;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	bcmsdh->vendevid = (VENDOR_BROADCOM << 16) | 0;
 	return (bcmsdh->vendevid);
 }
@@ -632,6 +689,8 @@ uint
 bcmsdh_query_iofnum(void *sdh)
 {
 	bcmsdh_info_t *bcmsdh = (bcmsdh_info_t *)sdh;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!bcmsdh)
 		bcmsdh = l_bcmsdh;
@@ -644,11 +703,15 @@ bcmsdh_reset(bcmsdh_info_t *sdh)
 {
 	bcmsdh_info_t *bcmsdh = (bcmsdh_info_t *)sdh;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return sdioh_sdio_reset(bcmsdh->sdioh);
 }
 
 void *bcmsdh_get_sdioh(bcmsdh_info_t *sdh)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	ASSERT(sdh);
 	return sdh->sdioh;
 }
@@ -657,12 +720,16 @@ void *bcmsdh_get_sdioh(bcmsdh_info_t *sdh)
 uint32
 bcmsdh_get_dstatus(void *sdh)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return 0;
 }
 uint32
 bcmsdh_cur_sbwad(void *sdh)
 {
 	bcmsdh_info_t *bcmsdh = (bcmsdh_info_t *)sdh;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!bcmsdh)
 		bcmsdh = l_bcmsdh;
@@ -673,6 +740,8 @@ bcmsdh_cur_sbwad(void *sdh)
 void
 bcmsdh_chipinfo(void *sdh, uint32 chip, uint32 chiprev)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return;
 }
 
@@ -683,6 +752,8 @@ bcmsdh_sleep(void *sdh, bool enab)
 #ifdef SDIOH_SLEEP_ENABLED
 	bcmsdh_info_t *p = (bcmsdh_info_t *)sdh;
 	sdioh_info_t *sd = (sdioh_info_t *)(p->sdioh);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	return sdioh_sleep(sd, enab);
 #else

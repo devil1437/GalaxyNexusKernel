@@ -108,6 +108,8 @@ static int bcmsdh_sdmmc_probe(struct sdio_func *func,
 {
 	int ret = 0;
 	static struct sdio_func sdio_func_0;
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sd_trace(("bcmsdh_sdmmc: %s Enter\n", __FUNCTION__));
 	sd_trace(("sdio_bcmsdh: func->class=%x\n", func->class));
 	sd_trace(("sdio_vendor: 0x%04x\n", func->vendor));
@@ -140,6 +142,8 @@ static int bcmsdh_sdmmc_probe(struct sdio_func *func,
 
 static void bcmsdh_sdmmc_remove(struct sdio_func *func)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sd_trace(("bcmsdh_sdmmc: %s Enter\n", __FUNCTION__));
 	sd_info(("sdio_bcmsdh: func->class=%x\n", func->class));
 	sd_info(("sdio_vendor: 0x%04x\n", func->vendor));
@@ -184,6 +188,8 @@ static int bcmsdh_sdmmc_suspend(struct device *pdev)
 	if (func->num != 2)
 		return 0;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sd_trace(("%s Enter\n", __FUNCTION__));
 
 	if (dhd_os_check_wakelock(bcmsdh_get_drvdata()))
@@ -215,6 +221,8 @@ static int bcmsdh_sdmmc_resume(struct device *pdev)
 #if defined(OOB_INTR_ONLY)
 	struct sdio_func *func = dev_to_sdio_func(pdev);
 #endif
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sd_trace(("%s Enter\n", __FUNCTION__));
 	dhd_mmc_suspend = FALSE;
 #if defined(OOB_INTR_ONLY)
@@ -255,6 +263,8 @@ sdioh_sdmmc_osinit(sdioh_info_t *sd)
 {
 	struct sdos_info *sdos;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sdos = (struct sdos_info*)MALLOC(sd->osh, sizeof(struct sdos_info));
 	sd->sdos_info = (void*)sdos;
 	if (sdos == NULL)
@@ -271,6 +281,8 @@ sdioh_sdmmc_osfree(sdioh_info_t *sd)
 	struct sdos_info *sdos;
 	ASSERT(sd && sd->sdos_info);
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sdos = (struct sdos_info *)sd->sdos_info;
 	MFREE(sd->osh, sdos, sizeof(struct sdos_info));
 }
@@ -281,6 +293,8 @@ sdioh_interrupt_set(sdioh_info_t *sd, bool enable)
 {
 	ulong flags;
 	struct sdos_info *sdos;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	sd_trace(("%s: %s\n", __FUNCTION__, enable ? "Enabling" : "Disabling"));
 
@@ -315,6 +329,8 @@ static int __init
 bcmsdh_module_init(void)
 {
 	int error = 0;
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sdio_function_init();
 	return error;
 }
@@ -322,6 +338,8 @@ bcmsdh_module_init(void)
 static void __exit
 bcmsdh_module_cleanup(void)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sdio_function_cleanup();
 }
 
@@ -339,6 +357,8 @@ MODULE_AUTHOR(AUTHOR);
 int sdio_function_init(void)
 {
 	int error = 0;
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sd_trace(("bcmsdh_sdmmc: %s Enter\n", __FUNCTION__));
 
 	gInstance = kzalloc(sizeof(BCMSDH_SDMMC_INSTANCE), GFP_KERNEL);
@@ -356,6 +376,8 @@ int sdio_function_init(void)
 extern int bcmsdh_remove(struct device *dev);
 void sdio_function_cleanup(void)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sd_trace(("%s Enter\n", __FUNCTION__));
 
 

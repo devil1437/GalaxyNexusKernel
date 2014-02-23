@@ -1731,6 +1731,8 @@ static void ieee80211_rx_mgmt_beacon(struct ieee80211_sub_if_data *sdata,
 
 	ASSERT_MGD_MTX(ifmgd);
 
+	printk("Processing beacon..");
+
 	/* Process beacon from the current BSS */
 	baselen = (u8 *) mgmt->u.beacon.variable - (u8 *) mgmt;
 	if (baselen > len)
@@ -1847,7 +1849,8 @@ static void ieee80211_rx_mgmt_beacon(struct ieee80211_sub_if_data *sdata,
 				 * to disable power save here. This needs
 				 * to be investigated.
 				 */
-				ieee80211_send_pspoll(local, sdata);
+				printk("Sending a PS-POLL frame to AP...");
+				//ieee80211_send_pspoll(local, sdata);
 			}
 		}
 	}

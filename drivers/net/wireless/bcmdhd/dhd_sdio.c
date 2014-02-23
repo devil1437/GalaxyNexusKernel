@@ -66,6 +66,11 @@
 #include <dhdioctl.h>
 #include <sdiovar.h>
 
+#include <linux/fs.h>
+#include <asm/uaccess.h>
+#define MY_WIFI_DEBUG(args)	printf	args
+#define MY_WIFI_TRACE(args)	printf	args
+
 #ifndef DHDSDIO_MEM_DUMP_FNAME
 #define DHDSDIO_MEM_DUMP_FNAME         "mem_dump"
 #endif
@@ -511,6 +516,9 @@ static void
 dhd_dongle_setmemsize(struct dhd_bus *bus, int mem_size)
 {
 	int32 min_size =  DONGLE_MIN_MEMSIZE;
+	
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	/* Restrict the memsize to user specified limit */
 	DHD_ERROR(("user: Restrict the dongle ram size to %d, min accepted %d\n",
 		dhd_dongle_memsize, min_size));
@@ -523,6 +531,8 @@ static int
 dhdsdio_set_siaddr_window(dhd_bus_t *bus, uint32 address)
 {
 	int err = 0;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	bcmsdh_cfg_write(bus->sdh, SDIO_FUNC_1, SBSDIO_FUNC1_SBADDRLOW,
 	                 (address >> 8) & SBSDIO_SBADDRLOW_MASK, &err);
 	if (!err)
@@ -544,6 +554,8 @@ dhdsdio_htclk(dhd_bus_t *bus, bool on, bool pendok)
 	int err;
 	uint8 clkctl, clkreq, devctl;
 	bcmsdh_info_t *sdh;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -672,6 +684,8 @@ dhdsdio_sdclk(dhd_bus_t *bus, bool on)
 	int err;
 	int32 iovalue;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	if (on) {
@@ -760,6 +774,8 @@ dhdsdio_clkctl(dhd_bus_t *bus, uint target, bool pendok)
 	uint oldstate = bus->clkstate;
 #endif /* DHD_DEBUG */
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	/* Early exit if we're already there */
@@ -824,6 +840,8 @@ dhdsdio_bussleep(dhd_bus_t *bus, bool sleep)
 	bcmsdh_info_t *sdh = bus->sdh;
 	sdpcmd_regs_t *regs = bus->regs;
 	uint retries = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_INFO(("dhdsdio_bussleep: request %s (currently %s)\n",
 	          (sleep ? "SLEEP" : "WAKE"),
@@ -913,6 +931,8 @@ dhd_enable_oob_intr(struct dhd_bus *bus, bool enable)
 	sdpcmd_regs_t *regs = bus->regs;
 	uint retries = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	dhdsdio_clkctl(bus, CLK_AVAIL, FALSE);
 	if (enable == TRUE) {
 
@@ -952,6 +972,8 @@ dhdsdio_txpkt(dhd_bus_t *bus, void *pkt, uint chan, bool free_pkt)
 	char *p;
 	htsfts_t *htsf_ts;
 #endif
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
@@ -1120,6 +1142,8 @@ dhd_bus_txdata(struct dhd_bus *bus, void *pkt)
 	osl_t *osh;
 	uint datalen, prec;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	osh = bus->dhd->osh;
@@ -1255,6 +1279,8 @@ dhdsdio_sendfromq(dhd_bus_t *bus, uint maxframes)
 	dhd_pub_t *dhd = bus->dhd;
 	sdpcmd_regs_t *regs = bus->regs;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	tx_prec_map = ~bus->flowcontrol;
@@ -1312,6 +1338,8 @@ dhd_bus_txctl(struct dhd_bus *bus, uchar *msg, uint msglen)
 	uint8 doff = 0;
 	int ret = -1;
 	int i;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -1468,6 +1496,8 @@ dhd_bus_rxctl(struct dhd_bus *bus, uchar *msg, uint msglen)
 	uint rxlen = 0;
 	bool pending = FALSE;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	if (bus->dhd->dongle_reset)
@@ -1612,6 +1642,8 @@ dhd_dump_pct(struct bcmstrbuf *strbuf, char *desc, uint num, uint div)
 {
 	uint q1, q2;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (!div) {
 		bcm_bprintf(strbuf, "%s N/A", desc);
 	} else {
@@ -1625,6 +1657,8 @@ void
 dhd_bus_dump(dhd_pub_t *dhdp, struct bcmstrbuf *strbuf)
 {
 	dhd_bus_t *bus = dhdp->bus;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	bcm_bprintf(strbuf, "Bus SDIO structure:\n");
 	bcm_bprintf(strbuf, "hostintmask 0x%08x intstatus 0x%08x sdpcm_ver %d\n",
@@ -1708,6 +1742,8 @@ dhd_bus_clearcounts(dhd_pub_t *dhdp)
 {
 	dhd_bus_t *bus = (dhd_bus_t *)dhdp->bus;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	bus->intrcount = bus->lastintrs = bus->spurious = bus->regfails = 0;
 	bus->rxrtx = bus->rx_toolong = bus->rxc_errors = 0;
 	bus->rx_hdrfail = bus->rx_badhdr = bus->rx_badseq = 0;
@@ -1721,6 +1757,8 @@ static int
 dhdsdio_pktgen_get(dhd_bus_t *bus, uint8 *arg)
 {
 	dhd_pktgen_t pktgen;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	pktgen.version = DHD_PKTGEN_VERSION;
 	pktgen.freq = bus->pktgen_freq;
@@ -1745,6 +1783,8 @@ dhdsdio_pktgen_set(dhd_bus_t *bus, uint8 *arg)
 {
 	dhd_pktgen_t pktgen;
 	uint oldcnt, oldmode;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	bcopy(arg, &pktgen, sizeof(pktgen));
 	if (pktgen.version != DHD_PKTGEN_VERSION)
@@ -1780,6 +1820,8 @@ dhdsdio_membytes(dhd_bus_t *bus, bool write, uint32 address, uint8 *data, uint s
 	int bcmerror = 0;
 	uint32 sdaddr;
 	uint dsize;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	/* Determine initial transfer parameters */
 	sdaddr = address & SBSDIO_SB_OFT_ADDR_MASK;
@@ -1835,6 +1877,8 @@ dhdsdio_readshared(dhd_bus_t *bus, sdpcm_shared_t *sh)
 	uint32 addr;
 	int rv;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	/* Read last word in memory to determine address of sdpcm_shared structure */
 	if ((rv = dhdsdio_membytes(bus, FALSE, bus->ramsize - 4, (uint8 *)&addr, 4)) < 0)
 		return rv;
@@ -1887,6 +1931,8 @@ dhdsdio_readconsole(dhd_bus_t *bus)
 	uint8 line[CONSOLE_LINE_MAX], ch;
 	uint32 n, idx, addr;
 	int rv;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	/* Don't do anything until FWREADY updates console address */
 	if (bus->console_addr == 0)
@@ -1966,6 +2012,8 @@ dhdsdio_checkdied(dhd_bus_t *bus, char *data, uint size)
 	uint8 line[CONSOLE_LINE_MAX], ch;
 	uint32 n, i, addr;
 	int rv;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -2135,6 +2183,8 @@ dhdsdio_downloadvars(dhd_bus_t *bus, void *arg, int len)
 {
 	int bcmerror = BCME_OK;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	/* Basic sanity checks */
@@ -2172,6 +2222,8 @@ dhd_serialconsole(dhd_bus_t *bus, bool set, bool enable, int *bcmerror)
 {
 	int int_val;
 	uint32 addr, data;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 
 	addr = SI_ENUM_BASE + OFFSETOF(chipcregs_t, chipcontrol_addr);
@@ -2222,6 +2274,8 @@ dhdsdio_doiovar(dhd_bus_t *bus, const bcm_iovar_t *vi, uint32 actionid, const ch
 	int bcmerror = 0;
 	int32 int_val = 0;
 	bool bool_val = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter, action %d name %s params %p plen %d arg %p len %d val_size %d\n",
 	           __FUNCTION__, actionid, name, params, plen, arg, len, val_size));
@@ -2714,6 +2768,8 @@ dhdsdio_write_vars(dhd_bus_t *bus)
 	uint8 *nvram_ularray;
 #endif /* DHD_DEBUG */
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	/* Even if there are no vars are to be written, we still need to set the ramsize. */
 	varsize = bus->varsz ? ROUNDUP(bus->varsz, 4) : 0;
 	varaddr = (bus->ramsize - 4) - varsize;
@@ -2798,6 +2854,8 @@ dhdsdio_download_state(dhd_bus_t *bus, bool enter)
 {
 	uint retries;
 	int bcmerror = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!bus->sih)
 		return BCME_ERROR;
@@ -2907,6 +2965,8 @@ dhd_bus_iovar_op(dhd_pub_t *dhdp, const char *name,
 	int val_size;
 	uint32 actionid;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	ASSERT(name);
@@ -3013,6 +3073,8 @@ dhd_bus_stop(struct dhd_bus *bus, bool enforce_mutex)
 	if (!bus->dhd)
 		return;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	osh = bus->dhd->osh;
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -3096,6 +3158,8 @@ dhd_bus_init(dhd_pub_t *dhdp, bool enforce_mutex)
 	uint8 ready, enable;
 	int err, ret = 0;
 	uint8 saveclk;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -3211,6 +3275,8 @@ dhdsdio_rxfail(dhd_bus_t *bus, bool abort, bool rtx)
 	uint8 hi, lo;
 	int err;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_ERROR(("%s: %sterminate frame%s\n", __FUNCTION__,
 	           (abort ? "abort command, " : ""), (rtx ? ", send NAK" : "")));
 
@@ -3267,6 +3333,8 @@ dhdsdio_read_control(dhd_bus_t *bus, uint8 *hdr, uint len, uint doff)
 	uint rdlen, pad;
 
 	int sdret;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -3379,6 +3447,8 @@ dhdsdio_rxglom(dhd_bus_t *bus, uint8 rxseq)
 
 	/* If packets, issue read(s) and send up packet chain */
 	/* Return sequence numbers consumed? */
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("dhdsdio_rxglom: start: glomd %p glom %p\n", bus->glomd, bus->glom));
 
@@ -3742,6 +3812,264 @@ dhdsdio_rxglom(dhd_bus_t *bus, uint8 rxseq)
 	return num;
 }
 
+mm_segment_t oldfs;
+
+struct file *openFile(char *path,int flag,int mode){
+	struct file *fp;
+ 
+	fp=filp_open(path, flag, 0);
+	if (fp) return fp;
+	else return NULL;
+}
+ 
+int readFile(struct file *fp,char *buf,int readlen){
+	if (fp->f_op && fp->f_op->read)
+		return fp->f_op->read(fp,buf,readlen, &fp->f_pos);
+	else
+		return -1;
+}
+ 
+int closeFile(struct file *fp){
+	filp_close(fp,NULL);
+	return 0;
+}
+ 
+void initKernelEnv(void){
+	oldfs = get_fs();
+	set_fs(KERNEL_DS);
+} 
+
+#define FILE_BUFF_SIZE 500
+#define MAX_WORD_COUNT 20
+
+/*
+ * Return the number of line of the buffer.
+ */
+int getNumLine(char *buf){
+	int i, count = 0;
+
+	//MY_WIFI_TRACE(("%s.\n", __FUNCTION__));
+
+	for(i = 0; i < FILE_BUFF_SIZE; i++){
+		if(buf[i] == '\0'){
+			return count;
+		}
+		if(buf[i] == '\n'){
+			count++;
+		}
+	}
+	
+	return count+1;
+}
+
+/*
+ * Split the IP address and the port number.
+ * Return the port number as an integer.
+ */
+int parsePort(char *buf){
+	int i, flag = -1, port;
+	char portStr[512];
+	
+	//MY_WIFI_TRACE(("%s.\n", __FUNCTION__));
+
+	memset(portStr,0,512);
+	
+	for(i = 0; i < FILE_BUFF_SIZE; i++){
+		if(buf[i] == ':'){
+			flag = 1;
+			portStr[0] = buf[i+1];
+			portStr[1] = buf[i+2];
+			portStr[2] = buf[i+3];
+			portStr[3] = buf[i+4];
+			break;
+		}
+	}
+
+	if(flag == 1){
+		sscanf(portStr, "%x", &port);
+		//port = (int)strtol(portStr, NULL, 16);
+		return port;
+	}
+	else{
+		return -10;
+	}
+}
+
+/*
+ * Return port number, uid.
+ */
+int parseLine(char *buf, int* returnValue){
+	int i, j, start = -1, wordCount = 0;
+	char word[MAX_WORD_COUNT][50];
+	
+	//MY_WIFI_TRACE(("%s. buf: %s\n", __FUNCTION__, buf));
+
+	memset(word, 0, MAX_WORD_COUNT*50);
+	
+	for(i = 0; i < FILE_BUFF_SIZE; i++){
+		if(buf[i] == '\0' || buf[i] == '\n'){
+			// Have read this line.
+			if(wordCount == 17){
+				returnValue[0] = parsePort(word[1]);
+				sscanf(word[7], "%d", &(returnValue[1]));
+				return 1;
+			}
+			else if(wordCount == 12){
+				return -2;
+			}
+			else{
+				return -3;
+			}
+		}
+		else if(buf[i] == ' ' || buf[i] == '\t'){
+			start = -1;
+		}
+		else{
+			if(start == -1){
+				start = i;
+				wordCount++;
+			}
+			if(wordCount > MAX_WORD_COUNT){
+				return -1;
+			}
+			word[wordCount-1][i-start] = buf[i];
+		}
+	}
+
+	return -5;
+}
+
+void readLine(char* buf, char* line, int lineNumber, int error){
+	int i, j, last = 0, start = -1, lineCount = 0;
+	
+	//MY_WIFI_TRACE(("%s.\n", __FUNCTION__));
+
+	if(error == -3){
+		for(i = 0; i < FILE_BUFF_SIZE; i++){
+			if(line[i] == '\0' || line[i] == '\n'){
+				last = i;
+				break;
+			}
+		}
+	}
+	else{
+		memset(line, 0, FILE_BUFF_SIZE);
+	}
+
+	for(i = 0; i < FILE_BUFF_SIZE; i++){
+		if(buf[i] == '\0'){
+			return;
+		}
+		if(lineCount == lineNumber){
+			start = i;
+			for(j = i; j < FILE_BUFF_SIZE; j++){
+				if(buf[j] == '\0' || buf[j] == '\n'){
+					line[last+j-start] = '\n';
+					return;
+				}
+				line[last+j-start] = buf[j];
+			}
+			line[last+j-start] = '\0';
+			return;
+		}	
+		if(buf[i] == '\n'){
+			lineCount++;
+		}
+		if(lineCount > lineNumber){
+			return;
+		}
+	}
+}
+
+int getListeningUid(int port){
+	char buf[FILE_BUFF_SIZE];
+	char line[FILE_BUFF_SIZE];
+	struct file *fp;
+	int ret, i, numLine = 0, err = -1;
+	int portAndUid[2] = {0, 0}; 
+
+	//MY_WIFI_TRACE(("%s. port: %d\n", __FUNCTION__, port));
+
+	initKernelEnv();
+	
+	fp=openFile("/proc/net/tcp",O_RDONLY,0);
+	
+	if (fp!=NULL){
+		memset(buf,0,FILE_BUFF_SIZE);
+		while ((ret=readFile(fp,buf,FILE_BUFF_SIZE))>0){
+			//MY_WIFI_TRACE(("buf:%s\n",buf));
+			numLine = getNumLine(buf);
+			for(i = 0; i < numLine; i++){
+				readLine(buf, line, i, err);
+				err = parseLine(line, portAndUid);
+				if(err > 0){
+					//MY_WIFI_DEBUG(("line:%d, port:%d, uid:%d\n", i, portAndUid[0], portAndUid[1]));
+					if(portAndUid[0] == port){
+						closeFile(fp);
+						set_fs(oldfs);
+						return portAndUid[1];
+					}	
+				}
+			}
+			memset(buf,0,FILE_BUFF_SIZE);
+		}
+		closeFile(fp);
+	}
+
+	err = -1;
+	numLine = 0;
+	fp=openFile("/proc/net/tcp6",O_RDONLY,0);
+	
+	if (fp!=NULL){
+		memset(buf,0,FILE_BUFF_SIZE);
+		while ((ret=readFile(fp,buf,FILE_BUFF_SIZE))>0){
+			//MY_WIFI_TRACE(("buf:%s\n",buf));
+			numLine = getNumLine(buf);
+			for(i = 0; i < numLine; i++){
+				readLine(buf, line, i, err);
+				err = parseLine(line, portAndUid);
+				if(err > 0){
+					//MY_WIFI_DEBUG(("line:%d, port:%d, uid:%d\n", i, portAndUid[0], portAndUid[1]));
+					if(portAndUid[0] == port){
+						closeFile(fp);
+						set_fs(oldfs);
+						return portAndUid[1];
+					}	
+				}
+			}
+			memset(buf,0,FILE_BUFF_SIZE);
+		}
+		closeFile(fp);
+	}
+	
+	set_fs(oldfs); 
+	return -1;
+}
+
+int getBacklightValue(void){
+	char buf[FILE_BUFF_SIZE];
+	struct file *fp;
+	int ret, brightness = -1; 	
+
+	//MY_WIFI_TRACE(("%s.\n", __FUNCTION__));
+	
+	initKernelEnv();
+	
+	fp=openFile("/sys/devices/omapdss/display0/backlight/s6e8aa0/brightness",O_RDONLY,0);
+	
+	if (fp!=NULL){
+		memset(buf,0,FILE_BUFF_SIZE);
+		if ((ret=readFile(fp,buf,FILE_BUFF_SIZE))>0){
+			sscanf(buf, "%d", &brightness);
+		}
+		else printk("read file error %d\n",ret);
+		closeFile(fp);
+	}
+	
+	set_fs(oldfs); 	
+	return brightness;
+}
+
 /* Return TRUE if there may be more frames to read */
 static uint
 dhdsdio_readframes(dhd_bus_t *bus, uint maxframes, bool *finished)
@@ -3769,6 +4097,10 @@ dhdsdio_readframes(dhd_bus_t *bus, uint maxframes, bool *finished)
 #if defined(DHD_DEBUG) || defined(SDTEST)
 	bool sdtest = FALSE;	/* To limit message spew from test mode */
 #endif
+	struct sk_buff *tmpPkt;
+	uchar *hw_header_p;	
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -4282,6 +4614,9 @@ deliver:
 			continue;
 		}
 
+		tmpPkt = (struct sk_buff*) pkt;
+		hw_header_p = (uchar *) tmpPkt->data;
+
 		/* Fill in packet len and prio, deliver upward */
 		PKTSETLEN(osh, pkt, len);
 		PKTPULL(osh, pkt, doff);
@@ -4308,6 +4643,45 @@ deliver:
 			continue;
 		}
 
+		uchar *A = hw_header_p;  
+    		
+		MY_WIFI_TRACE(("HW   : %d %d %d %d\n", A[0], A[1], A[2], A[3]));
+		MY_WIFI_TRACE(("SW   : seq=%d chan=%d %d doff=%d %d txmax=%d %d %d %d %d\n", A[4], A[5], A[6], A[7], A[8], A[9], A[10], A[11], A[12], A[13]));
+		MY_WIFI_TRACE(("BDC  : fl=%d pri=%d fl=%d rssi=%d\n", A[14], A[15], A[16], A[17]-256));
+		MY_WIFI_TRACE(("MAC  : DA=%02x %02x %02x %02x %02x %02x SA=%02x %02x %02x %02x %02x %02x proto=%02x%02x\n", A[18], A[19], A[20], A[21], A[22], A[23], A[24], A[25], A[26], A[27], A[28], A[29], A[30], A[31]));
+		MY_WIFI_TRACE(("MSDU : %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n", A[32], A[33], A[34], A[35], A[36], A[37], A[38], A[39], A[40], A[41]));
+
+		if(A[30] == 0x08 && A[31] == 0x00){
+			// 0x0800 IPv4,
+			// Start from A[32].
+			uchar *ip = &(A[32]);
+			MY_WIFI_DEBUG(("Receive a IPv4 packet.\n"));
+
+			// Lengh of IPv4 header.
+			// A unit is a word (4 bytes).			
+			uchar ipHdrLen = ip[0] << 4;
+			ipHdrLen = ipHdrLen >> 4;
+			ipHdrLen *= 4;
+
+			uchar protocol = ip[9];
+			if(protocol == 0x0006){
+				// 0x0006 TCP,
+				uchar *tcp = &(ip[ipHdrLen]);
+				int dstPort = tcp[3] | tcp[2] << 8;
+				int uid = getListeningUid(dstPort);
+				MY_WIFI_DEBUG(("ipHdrLen = %d, protocol = %02x, dstPort = %d, uid = %d\n", ipHdrLen, protocol, dstPort, uid));
+				if( (uid == 10033 || uid == 10065 || uid == 10067 || uid == 10075) && getBacklightValue() == 0){
+					MY_WIFI_DEBUG(("Drop a line packet.\n"));
+					dhd_os_sdlock_rxq(bus->dhd);
+					PKTFREE(bus->dhd->osh, pkt, FALSE);
+					dhd_os_sdunlock_rxq(bus->dhd);
+					continue;
+				}
+			}				
+		}
+		else{
+			MY_WIFI_DEBUG(("Receive a non-IPv4 packet.\n"));
+		}
 
 		/* Unlock during rx call */
 		dhd_os_sdunlock(bus->dhd);
@@ -4338,6 +4712,8 @@ dhdsdio_hostmail(dhd_bus_t *bus)
 	uint32 hmb_data;
 	uint8 fcbits;
 	uint retries = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -4441,6 +4817,8 @@ dhdsdio_dpc(dhd_bus_t *bus)
 	uint framecnt = 0;		  /* Temporary counter of tx/rx frames */
 	bool rxdone = TRUE;		  /* Flag for no more read data */
 	bool resched = FALSE;	  /* Flag indicating resched wanted */
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -4713,6 +5091,8 @@ dhd_bus_dpc(struct dhd_bus *bus)
 {
 	bool resched;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	/* Call the DPC directly. */
 	DHD_TRACE(("Calling dhdsdio_dpc() from %s\n", __FUNCTION__));
 	resched = dhdsdio_dpc(bus);
@@ -4725,6 +5105,8 @@ dhdsdio_isr(void *arg)
 {
 	dhd_bus_t *bus = (dhd_bus_t*)arg;
 	bcmsdh_info_t *sdh;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -4777,6 +5159,8 @@ dhdsdio_isr(void *arg)
 static void
 dhdsdio_pktgen_init(dhd_bus_t *bus)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	/* Default to specified length, or full range */
 	if (dhd_pktgen_len) {
 		bus->pktgen_maxlen = MIN(dhd_pktgen_len, MAX_PKTGEN_LEN);
@@ -4806,6 +5190,8 @@ dhdsdio_pktgen(dhd_bus_t *bus)
 	uint fillbyte;
 	osl_t *osh = bus->dhd->osh;
 	uint16 len;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	/* Display current count if appropriate */
 	if (bus->pktgen_print && (++bus->pktgen_ptick >= bus->pktgen_print)) {
@@ -4905,6 +5291,8 @@ dhdsdio_sdtest_set(dhd_bus_t *bus, uint8 count)
 	uint8 *data;
 	osl_t *osh = bus->dhd->osh;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	/* Allocate the packet */
 	if (!(pkt = PKTGET(osh, SDPCM_HDRLEN + SDPCM_TEST_HDRLEN + DHD_SDALIGN, TRUE))) {
 		DHD_ERROR(("%s: PKTGET failed!\n", __FUNCTION__));
@@ -4936,6 +5324,8 @@ dhdsdio_testrcv(dhd_bus_t *bus, void *pkt, uint seq)
 	uint8 extra;
 	uint16 len;
 	uint16 offset;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	/* Check for min length */
 	if ((pktlen = PKTLEN(osh, pkt)) < SDPCM_TEST_HDRLEN) {
@@ -5040,6 +5430,8 @@ dhdsdio_testrcv(dhd_bus_t *bus, void *pkt, uint seq)
 extern void
 dhd_disable_intr(dhd_pub_t *dhdp)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	dhd_bus_t *bus;
 	bus = dhdp->bus;
 	bcmsdh_intr_disable(bus->sdh);
@@ -5049,6 +5441,8 @@ extern bool
 dhd_bus_watchdog(dhd_pub_t *dhdp)
 {
 	dhd_bus_t *bus;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TIMER(("%s: Enter\n", __FUNCTION__));
 
@@ -5145,6 +5539,8 @@ dhd_bus_console_in(dhd_pub_t *dhdp, uchar *msg, uint msglen)
 	int rv;
 	void *pkt;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	/* Address could be zero if CONSOLE := 0 in dongle Makefile */
 	if (bus->console_addr == 0)
 		return BCME_UNSUPPORTED;
@@ -5203,6 +5599,8 @@ static void
 dhd_dump_cis(uint fn, uint8 *cis)
 {
 	uint byte, tag, tdata;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_INFO(("Function %d CIS:\n", fn));
 
 	for (tdata = byte = 0; byte < SBSDIO_CIS_SIZE_LIMIT; byte++) {
@@ -5231,6 +5629,8 @@ dhd_dump_cis(uint fn, uint8 *cis)
 static bool
 dhdsdio_chipmatch(uint16 chipid)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (chipid == BCM4325_CHIP_ID)
 		return TRUE;
 	if (chipid == BCM4329_CHIP_ID)
@@ -5266,6 +5666,8 @@ dhdsdio_probe(uint16 venid, uint16 devid, uint16 bus_no, uint16 slot,
 #ifdef PROP_TXSTATUS
 	uint up = 0;
 #endif
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 
 	/* Init global variables at run-time, not as part of the declaration.
 	 * This is required to support init/de-init of the driver. Initialization
@@ -5451,6 +5853,8 @@ dhdsdio_probe_attach(struct dhd_bus *bus, osl_t *osh, void *sdh, void *regsva,
 	int err = 0;
 	uint8 clkctl = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	bus->alp_only = TRUE;
 
 	/* Return the window to backplane enumeration space for core access */
@@ -5612,6 +6016,8 @@ fail:
 static bool
 dhdsdio_probe_malloc(dhd_bus_t *bus, osl_t *osh, void *sdh)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	if (bus->dhd->maxctl) {
@@ -5648,6 +6054,8 @@ static bool
 dhdsdio_probe_init(dhd_bus_t *bus, osl_t *osh, void *sdh)
 {
 	int32 fnum;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -5722,6 +6130,8 @@ dhd_bus_download_firmware(struct dhd_bus *bus, osl_t *osh,
                           char *pfw_path, char *pnv_path)
 {
 	bool ret;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	bus->fw_path = pfw_path;
 	bus->nv_path = pnv_path;
 
@@ -5735,6 +6145,8 @@ static bool
 dhdsdio_download_firmware(struct dhd_bus *bus, osl_t *osh, void *sdh)
 {
 	bool ret;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	/* Download the firmware */
 	DHD_OS_WAKE_LOCK(bus->dhd);
@@ -5752,6 +6164,8 @@ static void
 dhdsdio_release(dhd_bus_t *bus, osl_t *osh)
 {
 	bool dongle_isolation = FALSE;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	if (bus) {
@@ -5789,6 +6203,8 @@ dhdsdio_release(dhd_bus_t *bus, osl_t *osh)
 static void
 dhdsdio_release_malloc(dhd_bus_t *bus, osl_t *osh)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	if (bus->dhd && bus->dhd->dongle_reset)
@@ -5820,6 +6236,8 @@ dhdsdio_release_malloc(dhd_bus_t *bus, osl_t *osh)
 static void
 dhdsdio_release_dongle(dhd_bus_t *bus, osl_t *osh, bool dongle_isolation, bool reset_flag)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter bus->dhd %p bus->dhd->dongle_reset %d \n", __FUNCTION__,
 		bus->dhd, bus->dhd->dongle_reset));
 
@@ -5852,6 +6270,8 @@ dhdsdio_disconnect(void *ptr)
 {
 	dhd_bus_t *bus = (dhd_bus_t *)ptr;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	if (bus) {
@@ -5876,6 +6296,8 @@ static bcmsdh_driver_t dhd_sdio = {
 int
 dhd_bus_register(void)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	return bcmsdh_register(&dhd_sdio);
@@ -5884,6 +6306,8 @@ dhd_bus_register(void)
 void
 dhd_bus_unregister(void)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	bcmsdh_unregister();
@@ -5896,6 +6320,8 @@ dhdsdio_download_code_array(struct dhd_bus *bus)
 	int bcmerror = -1;
 	int offset = 0;
 	unsigned char *ularray = NULL;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_INFO(("%s: download embedded firmware...\n", __FUNCTION__));
 
@@ -5977,6 +6403,8 @@ dhdsdio_download_code_file(struct dhd_bus *bus, char *pfw_path)
 	void *image = NULL;
 	uint8 *memblock = NULL, *memptr;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_INFO(("%s: download firmware %s\n", __FUNCTION__, pfw_path));
 
 	image = dhd_os_open_image(pfw_path);
@@ -6030,6 +6458,8 @@ err:
 void
 dhd_bus_set_nvram_params(struct dhd_bus * bus, const char *nvram_params)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	bus->nvram_params = nvram_params;
 }
 
@@ -6043,6 +6473,8 @@ dhdsdio_download_nvram(struct dhd_bus *bus)
 	char *bufp;
 	char *pnv_path;
 	bool nvram_file_exists;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	pnv_path = bus->nv_path;
 
@@ -6111,6 +6543,8 @@ _dhdsdio_download_firmware(struct dhd_bus *bus)
 
 	bool embed = FALSE;	/* download embedded firmware */
 	bool dlok = FALSE;	/* download firmware succeeded */
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	/* Out immediately if no image to download */
 	if ((bus->fw_path == NULL) || (bus->fw_path[0] == '\0')) {
@@ -6186,6 +6620,8 @@ dhd_bcmsdh_recv_buf(dhd_bus_t *bus, uint32 addr, uint fn, uint flags, uint8 *buf
 {
 	int status;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	status = bcmsdh_recv_buf(bus->sdh, addr, fn, flags, buf, nbytes, pkt, complete, handle);
 
 	return status;
@@ -6195,6 +6631,8 @@ static int
 dhd_bcmsdh_send_buf(dhd_bus_t *bus, uint32 addr, uint fn, uint flags, uint8 *buf, uint nbytes,
 	void *pkt, bcmsdh_cmplt_fn_t complete, void *handle)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return (bcmsdh_send_buf(bus->sdh, addr, fn, flags, buf, nbytes, pkt, complete, handle));
 }
 
@@ -6203,6 +6641,8 @@ dhd_bus_chip(struct dhd_bus *bus)
 {
 	ASSERT(bus);
 	ASSERT(bus->sih != NULL);
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return bus->sih->chip;
 }
 
@@ -6210,18 +6650,24 @@ void *
 dhd_bus_pub(struct dhd_bus *bus)
 {
 	ASSERT(bus);
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return bus->dhd;
 }
 
 void *
 dhd_bus_txq(struct dhd_bus *bus)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return &bus->txq;
 }
 
 uint
 dhd_bus_hdrlen(struct dhd_bus *bus)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return SDPCM_HDRLEN;
 }
 
@@ -6230,6 +6676,8 @@ dhd_bus_devreset(dhd_pub_t *dhdp, uint8 flag)
 {
 	int bcmerror = 0;
 	dhd_bus_t *bus;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	bus = dhdp->bus;
 
@@ -6331,6 +6779,8 @@ uint dhd_bus_chip_id(dhd_pub_t *dhdp)
 {
 	dhd_bus_t *bus = dhdp->bus;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return bus->sih->chip;
 }
 
@@ -6338,6 +6788,8 @@ uint dhd_bus_chip_id(dhd_pub_t *dhdp)
 uint dhd_bus_chiprev_id(dhd_pub_t *dhdp)
 {
 	dhd_bus_t *bus = dhdp->bus;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	return bus->sih->chiprev;
 }
@@ -6347,6 +6799,8 @@ uint dhd_bus_chippkg_id(dhd_pub_t *dhdp)
 {
 	dhd_bus_t *bus = dhdp->bus;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return bus->sih->chippkg;
 }
 
@@ -6354,6 +6808,8 @@ int
 dhd_bus_membytes(dhd_pub_t *dhdp, bool set, uint32 address, uint8 *data, uint size)
 {
 	dhd_bus_t *bus;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	bus = dhdp->bus;
 	return dhdsdio_membytes(bus, set, address, data, size);

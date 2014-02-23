@@ -101,6 +101,8 @@ static struct net_device* lookup_real_netdev(char *name)
 	struct net_device *ndev;
 	struct net_device *ndev_found = NULL;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	/* We need to find interface "p2p-p2p-0" corresponding to monitor interface "mon-p2p-0",
 	 * Once mon iface name reaches IFNAMSIZ, it is reset to p2p0-0 and corresponding mon
 	 * iface would be mon-p2p0-0.
@@ -134,6 +136,8 @@ static monitor_interface* ndev_to_monif(struct net_device *ndev)
 {
 	int i;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	for (i = 0; i < DHD_MAX_IFS; i++) {
 		if (g_monitor.mon_if[i].mon_ndev == ndev)
 			return &g_monitor.mon_if[i];
@@ -146,6 +150,8 @@ static int dhd_mon_if_open(struct net_device *ndev)
 {
 	int ret = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	MON_PRINT("enter\n");
 	return ret;
 }
@@ -153,6 +159,8 @@ static int dhd_mon_if_open(struct net_device *ndev)
 static int dhd_mon_if_stop(struct net_device *ndev)
 {
 	int ret = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	MON_PRINT("enter\n");
 	return ret;
@@ -172,6 +180,8 @@ static int dhd_mon_if_subif_start_xmit(struct sk_buff *skb, struct net_device *n
 	struct ieee80211_hdr *dot11_hdr;
 	struct ieee80211_radiotap_header *rtap_hdr;
 	monitor_interface* mon_if;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	MON_PRINT("enter\n");
 
@@ -236,6 +246,8 @@ static void dhd_mon_if_set_multicast_list(struct net_device *ndev)
 {
 	monitor_interface* mon_if;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	mon_if = ndev_to_monif(ndev);
 	if (mon_if == NULL || mon_if->real_ndev == NULL) {
 		MON_PRINT(" cannot find matched net dev, skip the packet\n");
@@ -249,6 +261,8 @@ static int dhd_mon_if_change_mac(struct net_device *ndev, void *addr)
 {
 	int ret = 0;
 	monitor_interface* mon_if;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	mon_if = ndev_to_monif(ndev);
 	if (mon_if == NULL || mon_if->real_ndev == NULL) {
@@ -273,6 +287,8 @@ int dhd_add_monitor(char *name, struct net_device **new_ndev)
 	dhd_linux_monitor_t **dhd_mon;
 
 	mutex_lock(&g_monitor.lock);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	MON_TRACE("enter, if name: %s\n", name);
 	if (!name || !new_ndev) {
@@ -336,6 +352,8 @@ int dhd_del_monitor(struct net_device *ndev)
 {
 	int i;
 	bool rollback_lock = false;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (!ndev)
 		return -EINVAL;
 	mutex_lock(&g_monitor.lock);
@@ -370,6 +388,8 @@ int dhd_del_monitor(struct net_device *ndev)
 
 int dhd_monitor_init(void *dhd_pub)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (g_monitor.monitor_state == MONITOR_STATE_DEINIT) {
 		g_monitor.dhd_pub = dhd_pub;
 		mutex_init(&g_monitor.lock);
@@ -383,6 +403,8 @@ int dhd_monitor_uninit(void)
 	int i;
 	struct net_device *ndev;
 	bool rollback_lock = false;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	mutex_lock(&g_monitor.lock);
 	if (g_monitor.monitor_state != MONITOR_STATE_DEINIT) {
 		for (i = 0; i < DHD_MAX_IFS; i++) {

@@ -77,6 +77,9 @@ asmlinkage void __exception_irq_entry
 asm_do_IRQ(unsigned int irq, struct pt_regs *regs)
 {
 	struct pt_regs *old_regs = set_irq_regs(regs);
+	struct irq_desc *desc = irq_to_desc(irq);
+
+//	printk("%s IRQ=%d\n", __FUNCTION__, desc->irq_data.irq);
 
 	irq_enter();
 
@@ -88,6 +91,8 @@ asm_do_IRQ(unsigned int irq, struct pt_regs *regs)
 		if (printk_ratelimit())
 			printk(KERN_WARNING "Bad IRQ%u\n", irq);
 		ack_bad_irq(irq);
+//	} else if(desc->irq_data.irq == 162) {
+		
 	} else {
 		generic_handle_irq(irq);
 	}

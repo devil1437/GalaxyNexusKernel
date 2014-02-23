@@ -35,6 +35,7 @@
 #include <bcmutils.h>
 #include <linux/delay.h>
 #include <pcicfg.h>
+#include <dhd_dbg.h>
 
 #ifdef BCMASSERT_LOG
 #include <bcm_assert_log.h>
@@ -155,6 +156,8 @@ static int16 linuxbcmerrormap[] =
 int
 osl_error(int bcmerror)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (bcmerror > 0)
 		bcmerror = 0;
 	else if (bcmerror < BCME_LAST)
@@ -172,6 +175,8 @@ osl_attach(void *pdev, uint bustype, bool pkttag)
 	osl_t *osh;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 25))
 	gfp_t flags;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	flags = (in_atomic()) ? GFP_ATOMIC : GFP_KERNEL;
 	osh = kmalloc(sizeof(osl_t), flags);
@@ -245,6 +250,8 @@ osl_attach(void *pdev, uint bustype, bool pkttag)
 void
 osl_detach(osl_t *osh)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (osh == NULL)
 		return;
 
@@ -254,6 +261,8 @@ osl_detach(osl_t *osh)
 
 static struct sk_buff *osl_alloc_skb(unsigned int len)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 25)
 	gfp_t flags = (in_atomic()) ? GFP_ATOMIC : GFP_KERNEL;
 
@@ -269,6 +278,8 @@ void *
 osl_ctfpool_add(osl_t *osh)
 {
 	struct sk_buff *skb;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if ((osh == NULL) || (osh->ctfpool == NULL))
 		return NULL;
@@ -312,6 +323,8 @@ osl_ctfpool_add(osl_t *osh)
 void
 osl_ctfpool_replenish(osl_t *osh, uint thresh)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if ((osh == NULL) || (osh->ctfpool == NULL))
 		return;
 
@@ -334,6 +347,8 @@ osl_ctfpool_init(osl_t *osh, uint numobj, uint size)
 #else
 	osh->ctfpool = kmalloc(sizeof(ctfpool_t), GFP_ATOMIC);
 #endif 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	ASSERT(osh->ctfpool);
 	bzero(osh->ctfpool, sizeof(ctfpool_t));
 
@@ -356,6 +371,8 @@ void
 osl_ctfpool_cleanup(osl_t *osh)
 {
 	struct sk_buff *skb, *nskb;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if ((osh == NULL) || (osh->ctfpool == NULL))
 		return;
@@ -383,6 +400,8 @@ void
 osl_ctfpool_stats(osl_t *osh, void *b)
 {
 	struct bcmstrbuf *bb;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if ((osh == NULL) || (osh->ctfpool == NULL))
 		return;
@@ -412,6 +431,8 @@ static inline struct sk_buff *
 osl_pktfastget(osl_t *osh, uint len)
 {
 	struct sk_buff *skb;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	
 	if (osh->ctfpool == NULL)
@@ -458,6 +479,8 @@ osl_pktget(osl_t *osh, uint len)
 {
 	struct sk_buff *skb;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 #ifdef CTFPOOL
 	skb = osl_pktfastget(osh, len);
 	if ((skb != NULL) || ((skb = osl_alloc_skb(len)) != NULL)) {
@@ -478,6 +501,8 @@ static inline void
 osl_pktfastfree(osl_t *osh, struct sk_buff *skb)
 {
 	ctfpool_t *ctfpool;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	ctfpool = (ctfpool_t *)CTFPOOLPTR(osh, skb);
 	ASSERT(ctfpool != NULL);
@@ -513,6 +538,8 @@ void BCMFASTPATH
 osl_pktfree(osl_t *osh, void *p, bool send)
 {
 	struct sk_buff *skb, *nskb;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	skb = (struct sk_buff*) p;
 
@@ -553,6 +580,8 @@ osl_pktget_static(osl_t *osh, uint len)
 {
 	int i;
 	struct sk_buff *skb;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!bcm_static_skb || (len > (PAGE_SIZE * 2))) {
 		printk("%s: attempt to allocate huge packet (0x%x)\n", __FUNCTION__, len);
@@ -602,6 +631,8 @@ osl_pktfree_static(osl_t *osh, void *p, bool send)
 {
 	int i;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (!bcm_static_skb) {
 		osl_pktfree(osh, p, send);
 		return;
@@ -636,6 +667,8 @@ osl_pci_read_config(osl_t *osh, uint offset, uint size)
 	uint val = 0;
 	uint retry = PCI_CFG_RETRY;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	ASSERT((osh && (osh->magic == OS_HANDLE_MAGIC)));
 
 	
@@ -656,6 +689,8 @@ osl_pci_write_config(osl_t *osh, uint offset, uint size, uint val)
 {
 	uint retry = PCI_CFG_RETRY;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	ASSERT((osh && (osh->magic == OS_HANDLE_MAGIC)));
 
 	
@@ -675,6 +710,8 @@ osl_pci_write_config(osl_t *osh, uint offset, uint size, uint val)
 uint
 osl_pci_bus(osl_t *osh)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	ASSERT(osh && (osh->magic == OS_HANDLE_MAGIC) && osh->pdev);
 
 	return ((struct pci_dev *)osh->pdev)->bus->number;
@@ -684,6 +721,8 @@ osl_pci_bus(osl_t *osh)
 uint
 osl_pci_slot(osl_t *osh)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	ASSERT(osh && (osh->magic == OS_HANDLE_MAGIC) && osh->pdev);
 
 	return PCI_SLOT(((struct pci_dev *)osh->pdev)->devfn);
@@ -697,12 +736,16 @@ osl_pcmcia_attr(osl_t *osh, uint offset, char *buf, int size, bool write)
 void
 osl_pcmcia_read_attr(osl_t *osh, uint offset, void *buf, int size)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	osl_pcmcia_attr(osh, offset, (char *) buf, size, FALSE);
 }
 
 void
 osl_pcmcia_write_attr(osl_t *osh, uint offset, void *buf, int size)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	osl_pcmcia_attr(osh, offset, (char *) buf, size, TRUE);
 }
 
@@ -712,6 +755,8 @@ osl_malloc(osl_t *osh, uint size)
 	void *addr;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 25))
 	gfp_t flags;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	
 	if (osh)
@@ -735,6 +780,8 @@ osl_malloc(osl_t *osh, uint size)
 void
 osl_mfree(osl_t *osh, void *addr, uint size)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (osh) {
 		ASSERT(osh->magic == OS_HANDLE_MAGIC);
 		atomic_sub(size, &osh->malloced);
@@ -745,6 +792,8 @@ osl_mfree(osl_t *osh, void *addr, uint size)
 uint
 osl_malloced(osl_t *osh)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	ASSERT((osh && (osh->magic == OS_HANDLE_MAGIC)));
 	return (atomic_read(&osh->malloced));
 }
@@ -752,6 +801,8 @@ osl_malloced(osl_t *osh)
 uint
 osl_malloc_failed(osl_t *osh)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	ASSERT((osh && (osh->magic == OS_HANDLE_MAGIC)));
 	return (osh->failed);
 }
@@ -761,6 +812,8 @@ osl_malloc_failed(osl_t *osh)
 uint
 osl_dma_consistent_align(void)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return (PAGE_SIZE);
 }
 
@@ -768,6 +821,8 @@ void*
 osl_dma_alloc_consistent(osl_t *osh, uint size, uint16 align_bits, uint *alloced, ulong *pap)
 {
 	uint16 align = (1 << align_bits);
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	ASSERT((osh && (osh->magic == OS_HANDLE_MAGIC)));
 
 	if (!ISALIGNED(DMA_CONSISTENT_ALIGN, align))
@@ -780,6 +835,8 @@ osl_dma_alloc_consistent(osl_t *osh, uint size, uint16 align_bits, uint *alloced
 void
 osl_dma_free_consistent(osl_t *osh, void *va, uint size, ulong pa)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	ASSERT((osh && (osh->magic == OS_HANDLE_MAGIC)));
 
 	pci_free_consistent(osh->pdev, size, va, (dma_addr_t)pa);
@@ -790,6 +847,8 @@ osl_dma_map(osl_t *osh, void *va, uint size, int direction)
 {
 	int dir;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	ASSERT((osh && (osh->magic == OS_HANDLE_MAGIC)));
 	dir = (direction == DMA_TX)? PCI_DMA_TODEVICE: PCI_DMA_FROMDEVICE;
 	return (pci_map_single(osh->pdev, va, size, dir));
@@ -799,6 +858,8 @@ void BCMFASTPATH
 osl_dma_unmap(osl_t *osh, uint pa, uint size, int direction)
 {
 	int dir;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	ASSERT((osh && (osh->magic == OS_HANDLE_MAGIC)));
 	dir = (direction == DMA_TX)? PCI_DMA_TODEVICE: PCI_DMA_FROMDEVICE;
@@ -811,6 +872,8 @@ osl_assert(char *exp, char *file, int line)
 {
 	char tempbuf[256];
 	char *basename;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	basename = strrchr(file, '/');
 	
@@ -836,6 +899,8 @@ osl_delay(uint usec)
 {
 	uint d;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	while (usec > 0) {
 		d = MIN(usec, 1000);
 		udelay(d);
@@ -851,6 +916,8 @@ osl_pktdup(osl_t *osh, void *skb)
 	void * p;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 25))
 	gfp_t flags;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	flags = (in_atomic()) ? GFP_ATOMIC : GFP_KERNEL;
 	if ((p = skb_clone((struct sk_buff *)skb, flags)) == NULL)
@@ -892,6 +959,8 @@ osl_os_open_image(char *filename)
 {
 	struct file *fp;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	fp = filp_open(filename, O_RDONLY, 0);
 	
 	 if (IS_ERR(fp))
@@ -906,6 +975,8 @@ osl_os_get_image_block(char *buf, int len, void *image)
 	struct file *fp = (struct file *)image;
 	int rdlen;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (!image)
 		return 0;
 
@@ -919,6 +990,8 @@ osl_os_get_image_block(char *buf, int len, void *image)
 void
 osl_os_close_image(void *image)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (image)
 		filp_close((struct file *)image, NULL);
 }

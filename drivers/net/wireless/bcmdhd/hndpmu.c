@@ -34,6 +34,7 @@
 #include <hndsoc.h>
 #include <sbchipc.h>
 #include <hndpmu.h>
+#include <dhd_dbg.h>
 
 #define	PMU_ERROR(args)
 
@@ -119,6 +120,8 @@ si_sdiod_drive_strength_init(si_t *sih, osl_t *osh, uint32 drivestrength)
 	sdiod_drive_str_t *str_tab = NULL;
 	uint32 str_mask = 0;
 	uint32 str_shift = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!(sih->cccaps & CC_CAP_PMU)) {
 		return;

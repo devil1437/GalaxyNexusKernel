@@ -29,6 +29,7 @@
 
 #if defined(DHD_DEBUG)
 
+#define DHD_MYTRACE(args)       //do {if (dhd_msg_level & DHD_ERROR_VAL) printf args;} while (0)
 #define DHD_ERROR(args)		do {if ((dhd_msg_level & DHD_ERROR_VAL) && (net_ratelimit())) \
 							printf args;} while (0)
 #define DHD_TRACE(args)		do {if (dhd_msg_level & DHD_TRACE_VAL) printf args;} while (0)

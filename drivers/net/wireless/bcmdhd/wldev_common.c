@@ -31,6 +31,7 @@
 
 #include <wldev_common.h>
 #include <bcmutils.h>
+#include <dhd_dbg.h>
 
 #define htod32(i) i
 #define htod16(i) i
@@ -53,6 +54,8 @@ s32 wldev_ioctl(
 	s32 ret = 0;
 	struct wl_ioctl ioc;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	memset(&ioc, 0, sizeof(ioc));
 	ioc.cmd = cmd;
 	ioc.buf = arg;
@@ -73,6 +76,8 @@ static s32 wldev_mkiovar(
 {
 	s32 iolen = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	iolen = bcm_mkiovar(iovar_name, param, paramlen, iovar_buf, buflen);
 	return iolen;
 }
@@ -83,6 +88,8 @@ s32 wldev_iovar_getbuf(
 {
 	s32 ret = 0;
 	s32 iovar_len = 0;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (buf_sync) {
 		mutex_lock(buf_sync);
 	}
@@ -100,6 +107,8 @@ s32 wldev_iovar_setbuf(
 {
 	s32 ret = 0;
 	s32 iovar_len;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (buf_sync) {
 		mutex_lock(buf_sync);
 	}
@@ -115,6 +124,8 @@ s32 wldev_iovar_setint(
 {
 	s8 iovar_buf[WLC_IOCTL_SMLEN];
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	val = htod32(val);
 	memset(iovar_buf, 0, sizeof(iovar_buf));
 	return wldev_iovar_setbuf(dev, iovar, &val, sizeof(val), iovar_buf,
@@ -127,6 +138,8 @@ s32 wldev_iovar_getint(
 {
 	s8 iovar_buf[WLC_IOCTL_SMLEN];
 	s32 err;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	memset(iovar_buf, 0, sizeof(iovar_buf));
 	err = wldev_iovar_getbuf(dev, iovar, pval, sizeof(*pval), iovar_buf,
@@ -152,6 +165,8 @@ s32 wldev_mkiovar_bsscfg(
 	u32 prefixlen;
 	u32 namelen;
 	u32 iolen;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (bssidx == 0) {
 		return wldev_mkiovar((s8*)iovar_name, (s8 *)param, paramlen,
@@ -197,6 +212,8 @@ s32 wldev_iovar_getbuf_bsscfg(
 {
 	s32 ret = 0;
 	s32 iovar_len = 0;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (buf_sync) {
 		mutex_lock(buf_sync);
 	}
@@ -215,6 +232,8 @@ s32 wldev_iovar_setbuf_bsscfg(
 {
 	s32 ret = 0;
 	s32 iovar_len;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (buf_sync) {
 		mutex_lock(buf_sync);
 	}
@@ -232,6 +251,8 @@ s32 wldev_iovar_setint_bsscfg(
 {
 	s8 iovar_buf[WLC_IOCTL_SMLEN];
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	val = htod32(val);
 	memset(iovar_buf, 0, sizeof(iovar_buf));
 	return wldev_iovar_setbuf_bsscfg(dev, iovar, &val, sizeof(val), iovar_buf,
@@ -244,6 +265,8 @@ s32 wldev_iovar_getint_bsscfg(
 {
 	s8 iovar_buf[WLC_IOCTL_SMLEN];
 	s32 err;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	memset(iovar_buf, 0, sizeof(iovar_buf));
 	err = wldev_iovar_getbuf_bsscfg(dev, iovar, pval, sizeof(*pval), iovar_buf,
@@ -260,6 +283,8 @@ int wldev_get_link_speed(
 	struct net_device *dev, int *plink_speed)
 {
 	int error;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!plink_speed)
 		return -ENOMEM;
@@ -278,6 +303,8 @@ int wldev_get_rssi(
 	scb_val_t scb_val;
 	int error;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (!prssi)
 		return -ENOMEM;
 	bzero(&scb_val, sizeof(scb_val_t));
@@ -295,6 +322,8 @@ int wldev_get_ssid(
 {
 	int error;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (!pssid)
 		return -ENOMEM;
 	error = wldev_ioctl(dev, WLC_GET_SSID, pssid, sizeof(wlc_ssid_t), 0);
@@ -309,6 +338,8 @@ int wldev_get_band(
 {
 	int error;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	error = wldev_ioctl(dev, WLC_GET_BAND, pband, sizeof(uint), 0);
 	return error;
 }
@@ -317,6 +348,8 @@ int wldev_set_band(
 	struct net_device *dev, uint band)
 {
 	int error = -1;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if ((band == WLC_BAND_AUTO) || (band == WLC_BAND_5G) || (band == WLC_BAND_2G)) {
 		error = wldev_ioctl(dev, WLC_SET_BAND, &band, sizeof(band), 1);
@@ -333,6 +366,8 @@ int wldev_set_country(
 	wl_country_t cspec = {{0}, 0, {0}};
 	scb_val_t scbval;
 	char smbuf[WLC_IOCTL_SMLEN];
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!country_code) {
 		WLDEV_ERROR(("%s: set country failed for %s\n",
@@ -384,6 +419,8 @@ int wldev_get_auto_channel(struct net_device *dev, int *chan)
 	int updown = 0;
 	int ret = 0;
 	wlc_ssid_t null_ssid;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	memset(&null_ssid, 0, sizeof(wlc_ssid_t));
 	ret |= wldev_ioctl(dev, WLC_UP, &updown, sizeof(updown), true);

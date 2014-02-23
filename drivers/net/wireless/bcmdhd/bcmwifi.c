@@ -47,7 +47,7 @@
 #include <bcmstdlib.h> 	
 #endif
 
-
+#include <dhd_dbg.h>
 
 
 
@@ -56,6 +56,8 @@ wf_chspec_ntoa(chanspec_t chspec, char *buf)
 {
 	const char *band, *bw, *sb;
 	uint channel;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	band = "";
 	bw = "";
@@ -89,6 +91,8 @@ wf_chspec_aton(char *a)
 	char *endp = NULL;
 	uint channel, band, bw, ctl_sb;
 	char c;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	channel = strtoul(a, &endp, 10);
 
@@ -150,6 +154,8 @@ bool
 wf_chspec_malformed(chanspec_t chanspec)
 {
 	
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (!CHSPEC_IS5G(chanspec) && !CHSPEC_IS2G(chanspec))
 		return TRUE;
 	
@@ -174,6 +180,8 @@ wf_chspec_ctlchan(chanspec_t chspec)
 {
 	uint8 ctl_chan;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	
 	if (CHSPEC_CTL_SB(chspec) == WL_CHANSPEC_CTL_SB_NONE) {
 		return CHSPEC_CHANNEL(chspec);
@@ -197,6 +205,8 @@ wf_chspec_ctlchan(chanspec_t chspec)
 chanspec_t
 wf_chspec_ctlchspec(chanspec_t chspec)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	chanspec_t ctl_chspec = 0;
 	uint8 channel;
 
@@ -224,6 +234,8 @@ wf_mhz2channel(uint freq, uint start_factor)
 	int ch = -1;
 	uint base;
 	int offset;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	
 	if (start_factor == 0) {
@@ -261,6 +273,8 @@ int
 wf_channel2mhz(uint ch, uint start_factor)
 {
 	int freq;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if ((start_factor == WF_CHAN_FACTOR_2_4_G && (ch < 1 || ch > 14)) ||
 	    (ch > 200))

@@ -41,7 +41,7 @@ extern uint32 wl_msg_level2;
 #define WL_NONE(args)
 
 #define WL_ERROR(args)
-#define WL_TRACE(args)
+#define WL_TRACE(args)	printf args
 
 
 extern uint32 wl_msg_level;

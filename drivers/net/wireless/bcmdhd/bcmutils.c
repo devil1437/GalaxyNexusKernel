@@ -53,7 +53,7 @@
 #include <proto/bcmip.h>
 #include <proto/802.1d.h>
 #include <proto/802.11.h>
-
+#include <dhd_dbg.h>
 void *_bcmutils_dummy_fn = NULL;
 
 #ifdef BCMDRIVER
@@ -65,6 +65,8 @@ uint
 pktcopy(osl_t *osh, void *p, uint offset, int len, uchar *buf)
 {
 	uint n, ret = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (len < 0)
 		len = 4096; /* "infinite" */
@@ -98,6 +100,8 @@ pktfrombuf(osl_t *osh, void *p, uint offset, int len, uchar *buf)
 {
 	uint n, ret = 0;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	/* skip 'offset' bytes */
 	for (; p && offset; p = PKTNEXT(osh, p)) {
 		if (offset < (uint)PKTLEN(osh, p))
@@ -129,6 +133,8 @@ pkttotlen(osl_t *osh, void *p)
 {
 	uint total;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	total = 0;
 	for (; p; p = PKTNEXT(osh, p))
 		total += PKTLEN(osh, p);
@@ -139,6 +145,8 @@ pkttotlen(osl_t *osh, void *p)
 void *
 pktlast(osl_t *osh, void *p)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	for (; PKTNEXT(osh, p); p = PKTNEXT(osh, p))
 		;
 
@@ -150,6 +158,8 @@ uint BCMFASTPATH
 pktsegcnt(osl_t *osh, void *p)
 {
 	uint cnt;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	for (cnt = 0; p; p = PKTNEXT(osh, p))
 		cnt++;
@@ -172,6 +182,8 @@ pktq_penq(struct pktq *pq, int prec, void *p)
 
 	ASSERT(!pktq_full(pq));
 	ASSERT(!pktq_pfull(pq, prec));
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	q = &pq->q[prec];
 
@@ -202,6 +214,8 @@ pktq_penq_head(struct pktq *pq, int prec, void *p)
 	ASSERT(!pktq_full(pq));
 	ASSERT(!pktq_pfull(pq, prec));
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	q = &pq->q[prec];
 
 	if (q->head == NULL)
@@ -227,6 +241,8 @@ pktq_pdeq(struct pktq *pq, int prec)
 
 	ASSERT(prec >= 0 && prec < pq->num_prec);
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	q = &pq->q[prec];
 
 	if ((p = q->head) == NULL)
@@ -251,6 +267,8 @@ pktq_pdeq_tail(struct pktq *pq, int prec)
 	void *p, *prev;
 
 	ASSERT(prec >= 0 && prec < pq->num_prec);
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	q = &pq->q[prec];
 
@@ -278,6 +296,8 @@ pktq_pflush(osl_t *osh, struct pktq *pq, int prec, bool dir, ifpkt_cb_t fn, int 
 {
 	struct pktq_prec *q;
 	void *p, *prev = NULL;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	q = &pq->q[prec];
 	p = q->head;
@@ -313,6 +333,8 @@ pktq_pdel(struct pktq *pq, void *pktbuf, int prec)
 
 	ASSERT(prec >= 0 && prec < pq->num_prec);
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (!pktbuf)
 		return FALSE;
 
@@ -345,6 +367,8 @@ pktq_init(struct pktq *pq, int num_prec, int max_len)
 
 	ASSERT(num_prec > 0 && num_prec <= PKTQ_MAX_PREC);
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	/* pq is variable size; only zero out what's requested */
 	bzero(pq, OFFSETOF(struct pktq, q) + (sizeof(struct pktq_prec) * num_prec));
 
@@ -362,6 +386,8 @@ pktq_deq(struct pktq *pq, int *prec_out)
 	struct pktq_prec *q;
 	void *p;
 	int prec;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (pq->len == 0)
 		return NULL;
@@ -395,6 +421,8 @@ pktq_deq_tail(struct pktq *pq, int *prec_out)
 	struct pktq_prec *q;
 	void *p, *prev;
 	int prec;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (pq->len == 0)
 		return NULL;
@@ -434,6 +462,8 @@ pktq_peek(struct pktq *pq, int *prec_out)
 {
 	int prec;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (pq->len == 0)
 		return NULL;
 
@@ -450,6 +480,8 @@ void *
 pktq_peek_tail(struct pktq *pq, int *prec_out)
 {
 	int prec;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (pq->len == 0)
 		return NULL;
@@ -468,6 +500,8 @@ void
 pktq_flush(osl_t *osh, struct pktq *pq, bool dir, ifpkt_cb_t fn, int arg)
 {
 	int prec;
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	for (prec = 0; prec < pq->num_prec; prec++)
 		pktq_pflush(osh, pq, prec, dir, fn, arg);
 	if (fn == NULL)
@@ -479,6 +513,8 @@ int
 pktq_mlen(struct pktq *pq, uint prec_bmp)
 {
 	int prec, len;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	len = 0;
 
@@ -496,6 +532,8 @@ pktq_mdeq(struct pktq *pq, uint prec_bmp, int *prec_out)
 	struct pktq_prec *q;
 	void *p;
 	int prec;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (pq->len == 0)
 		return NULL;
@@ -572,6 +610,8 @@ bcm_strtoul(char *cp, char **endp, uint base)
 	ulong result, last_result = 0, value;
 	bool minus;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	minus = FALSE;
 
 	while (bcm_isspace(*cp))
@@ -624,6 +664,8 @@ bcm_strtoul(char *cp, char **endp, uint base)
 int
 bcm_atoi(char *s)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	return (int)bcm_strtoul(s, NULL, 10);
 }
 
@@ -633,6 +675,8 @@ bcmstrstr(char *haystack, char *needle)
 {
 	int len, nlen;
 	int i;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if ((haystack == NULL) || (needle == NULL))
 		return (haystack);
@@ -651,6 +695,8 @@ bcmstrcat(char *dest, const char *src)
 {
 	char *p;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	p = dest + strlen(dest);
 
 	while ((*p++ = *src++) != '\0')
@@ -664,6 +710,8 @@ bcmstrncat(char *dest, const char *src, uint size)
 {
 	char *endp;
 	char *p;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	p = dest + strlen(dest);
 	endp = p + size;
@@ -701,6 +749,8 @@ bcmstrtok(char **string, const char *delimiters, char *tokdelim)
 	unsigned long map[8];
 	int count;
 	char *nextoken;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (tokdelim != NULL) {
 		/* Prime the token delimiter */
@@ -777,6 +827,8 @@ bcmstricmp(const char *s1, const char *s2)
 {
 	char dc, sc;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	while (*s2 && *s1) {
 		dc = xToLower(*s1);
 		sc = xToLower(*s2);
@@ -811,6 +863,8 @@ bcmstrnicmp(const char* s1, const char* s2, int cnt)
 {
 	char dc, sc;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	while (*s2 && *s1 && cnt) {
 		dc = xToLower(*s1);
 		sc = xToLower(*s2);
@@ -833,6 +887,8 @@ bcm_ether_atoe(char *p, struct ether_addr *ea)
 {
 	int i = 0;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	for (;;) {
 		ea->octet[i++] = (char) bcm_strtoul(p, &p, 16);
 		if (!*p++ || i == 6)
@@ -853,6 +909,8 @@ wchar2ascii(char *abuf, ushort *wbuf, ushort wbuflen, ulong abuflen)
 {
 	ulong copyct = 1;
 	ushort i;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (abuflen == 0)
 		return 0;
@@ -876,6 +934,8 @@ char *
 bcm_ether_ntoa(const struct ether_addr *ea, char *buf)
 {
 	static const char template[] = "%02x:%02x:%02x:%02x:%02x:%02x";
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	snprintf(buf, 18, template,
 		ea->octet[0]&0xff, ea->octet[1]&0xff, ea->octet[2]&0xff,
 		ea->octet[3]&0xff, ea->octet[4]&0xff, ea->octet[5]&0xff);
@@ -885,6 +945,8 @@ bcm_ether_ntoa(const struct ether_addr *ea, char *buf)
 char *
 bcm_ip_ntoa(struct ipv4_addr *ia, char *buf)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	snprintf(buf, 16, "%d.%d.%d.%d",
 		ia->addr[0], ia->addr[1], ia->addr[2], ia->addr[3]);
 	return (buf);
@@ -896,6 +958,8 @@ void
 bcm_mdelay(uint ms)
 {
 	uint i;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	for (i = 0; i < ms; i++) {
 		OSL_DELAY(1000);
@@ -912,6 +976,8 @@ void
 prpkt(const char *msg, osl_t *osh, void *p0)
 {
 	void *p;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (msg && (msg[0] != '\0'))
 		printf("%s:\n", msg);
@@ -933,6 +999,8 @@ pktsetprio(void *pkt, bool update_vtag)
 	uint8 *pktdata;
 	int priority = 0;
 	int rc = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	pktdata = (uint8 *) PKTDATA(NULL, pkt);
 	ASSERT(ISALIGNED((uintptr)pktdata, sizeof(uint16)));
@@ -998,6 +1066,8 @@ bcmerrorstr(int bcmerror)
 	/* check if someone added a bcmerror code but forgot to add errorstring */
 	ASSERT(ABS(BCME_LAST) == (ARRAYSIZE(bcmerrorstrtable) - 1));
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (bcmerror > 0 || bcmerror < BCME_LAST) {
 		snprintf(bcm_undeferrstr, sizeof(bcm_undeferrstr), "Undefined error %d", bcmerror);
 		return bcm_undeferrstr;
@@ -1017,6 +1087,8 @@ bcm_iovar_lookup(const bcm_iovar_t *table, const char *name)
 {
 	const bcm_iovar_t *vi;
 	const char *lookup_name;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	/* skip any ':' delimited option prefixes */
 	lookup_name = strrchr(name, ':');
@@ -1040,6 +1112,8 @@ int
 bcm_iovar_lencheck(const bcm_iovar_t *vi, void *arg, int len, bool set)
 {
 	int bcmerror = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	/* length check on io buf */
 	switch (vi->type) {
@@ -1155,6 +1229,8 @@ hndcrc8(
 	/* hard code the crc loop instead of using CRC_INNER_LOOP macro
 	 * to avoid the undefined and unnecessary (uint8 >> 8) operation.
 	 */
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	while (nbytes-- > 0)
 		crc = crc8_table[(crc ^ *pdata++) & 0xff];
 
@@ -1225,6 +1301,8 @@ hndcrc16(
 	uint16 crc     /* either CRC16_INIT_VALUE or previous return value */
 )
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	while (nbytes-- > 0)
 		CRC_INNER_LOOP(16, crc, *pdata++);
 	return crc;
@@ -1309,6 +1387,8 @@ hndcrc32(uint8 *pdata, uint nbytes, uint32 crc)
 	uint8 tmp[4];
 	ulong *tptr = (ulong *)tmp;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	/* in case the beginning of the buffer isn't aligned */
 	pend = (uint8 *)((uint)(pdata + 3) & 0xfffffffc);
 	nbytes -= (pend - pdata);
@@ -1356,6 +1436,8 @@ testcrc32(void)
 
 	ASSERT((buf = MALLOC(CBUFSIZ*CNBUFS)) != NULL);
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	/* step through all possible alignments */
 	for (l = 0; l <= 4; l++) {
 		for (j = 0; j < CNBUFS; j++) {
@@ -1388,6 +1470,8 @@ bcm_next_tlv(bcm_tlv_t *elt, int *buflen)
 {
 	int len;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	/* validate current elt */
 	if (!bcm_valid_tlv(elt, *buflen))
 		return NULL;
@@ -1414,6 +1498,8 @@ bcm_parse_tlvs(void *buf, int buflen, uint key)
 {
 	bcm_tlv_t *elt;
 	int totlen;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	elt = (bcm_tlv_t*)buf;
 	totlen = buflen;
@@ -1444,6 +1530,8 @@ bcm_parse_ordered_tlvs(void *buf, int buflen, uint key)
 {
 	bcm_tlv_t *elt;
 	int totlen;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	elt = (bcm_tlv_t*)buf;
 	totlen = buflen;
@@ -1478,6 +1566,8 @@ bcm_format_flags(const bcm_bit_desc_t *bd, uint32 flags, char* buf, int len)
 	int slen = 0, nlen = 0;
 	uint32 bit;
 	const char* name;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (len < 2 || !buf)
 		return 0;
@@ -1533,6 +1623,8 @@ bcm_format_hex(char *str, const void *bytes, int len)
 	char *p = str;
 	const uint8 *src = (const uint8*)bytes;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	for (i = 0; i < len; i++) {
 		p += snprintf(p, 3, "%02X", *src);
 		src++;
@@ -1549,6 +1641,8 @@ prhex(const char *msg, uchar *buf, uint nbytes)
 	int len = sizeof(line);
 	int nchar;
 	uint i;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (msg && (msg[0] != '\0'))
 		printf("%s:\n", msg);
@@ -1596,6 +1690,8 @@ static const char *crypto_algo_names[] = {
 const char *
 bcm_crypto_algo_name(uint algo)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	return (algo < ARRAYSIZE(crypto_algo_names)) ? crypto_algo_names[algo] : "ERR";
 }
 
@@ -1604,6 +1700,8 @@ char *
 bcm_chipname(uint chipid, char *buf, uint len)
 {
 	const char *fmt;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	fmt = ((chipid > 0xa000) || (chipid < 0x4000)) ? "%d" : "%x";
 	snprintf(buf, len, fmt, chipid);
@@ -1614,6 +1712,8 @@ bcm_chipname(uint chipid, char *buf, uint len)
 char *
 bcm_brev_str(uint32 brev, char *buf)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (brev < 0x100)
 		snprintf(buf, 8, "%d.%d", (brev & 0xf0) >> 4, brev & 0xf);
 	else
@@ -1630,6 +1730,8 @@ printbig(char *buf)
 {
 	uint len, max_len;
 	char c;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	len = strlen(buf);
 
@@ -1658,6 +1760,8 @@ bcmdumpfields(bcmutl_rdreg_rtn read_rtn, void *arg0, uint arg1, struct fielddesc
 	int len;
 	struct fielddesc *cur_ptr;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	filled_len = 0;
 	cur_ptr = fielddesc_array;
 
@@ -1681,6 +1785,8 @@ uint
 bcm_mkiovar(char *name, char *data, uint datalen, char *buf, uint buflen)
 {
 	uint len;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	len = strlen(name) + 1;
 
@@ -1731,6 +1837,8 @@ bcm_qdbm_to_mw(uint8 qdbm)
 	uint factor = 1;
 	int idx = qdbm - QDBM_OFFSET;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (idx >= QDBM_TABLE_LEN) {
 		/* clamp to max uint16 mW value */
 		return 0xFFFF;
@@ -1757,6 +1865,8 @@ bcm_mw_to_qdbm(uint16 mw)
 	int offset;
 	uint mw_uint = mw;
 	uint boundary;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	/* handle boundary case */
 	if (mw_uint <= 1)
@@ -1788,6 +1898,8 @@ bcm_bitcount(uint8 *bitmap, uint length)
 {
 	uint bitcount = 0, i;
 	uint8 tmp;
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	for (i = 0; i < length; i++) {
 		tmp = bitmap[i];
 		while (tmp) {
@@ -1804,6 +1916,8 @@ bcm_bitcount(uint8 *bitmap, uint length)
 void
 bcm_binit(struct bcmstrbuf *b, char *buf, uint size)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	b->origsize = b->size = size;
 	b->origbuf = b->buf = buf;
 }
@@ -1814,6 +1928,8 @@ bcm_bprintf(struct bcmstrbuf *b, const char *fmt, ...)
 {
 	va_list ap;
 	int r;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	va_start(ap, fmt);
 	r = vsnprintf(b->buf, b->size, fmt, ap);
@@ -1839,6 +1955,8 @@ bcm_inc_bytes(uchar *num, int num_bytes, uint8 amount)
 {
 	int i;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	for (i = 0; i < num_bytes; i++) {
 		num[i] += amount;
 		if (num[i] >= amount)
@@ -1852,6 +1970,8 @@ bcm_cmp_bytes(uchar *arg1, uchar *arg2, uint8 nbytes)
 {
 	int i;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	for (i = nbytes - 1; i >= 0; i--) {
 		if (arg1[i] != arg2[i])
 			return (arg1[i] - arg2[i]);
@@ -1864,6 +1984,8 @@ bcm_print_bytes(char *name, const uchar *data, int len)
 {
 	int i;
 	int per_line = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	printf("%s: %d \n", name ? name : "", len);
 	for (i = 0; i < len; i++) {
@@ -1886,6 +2008,8 @@ bcm_format_ssid(char* buf, const uchar ssid[], uint ssid_len)
 	uint i, c;
 	char *p = buf;
 	char *endp = buf + SSID_FMT_BUF_LEN;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (ssid_len > DOT11_MAX_SSID_LEN) ssid_len = DOT11_MAX_SSID_LEN;
 
@@ -1924,6 +2048,8 @@ process_nvram_vars(char *varbuf, unsigned int len)
 	int column;
 	unsigned int buf_len, n;
 	unsigned int pad = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	dp = varbuf;
 

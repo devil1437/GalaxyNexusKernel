@@ -34,6 +34,7 @@
 #include <hndsoc.h>
 #include <sbchipc.h>
 #include <pcicfg.h>
+#include <dhd_dbg.h>
 
 #include "siutils_priv.h"
 
@@ -46,6 +47,8 @@ get_erom_ent(si_t *sih, uint32 **eromptr, uint32 mask, uint32 match)
 {
 	uint32 ent;
 	uint inv = 0, nom = 0;
+	
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	while (TRUE) {
 		ent = R_REG(si_osh(sih), *eromptr);
@@ -80,6 +83,8 @@ get_asd(si_t *sih, uint32 **eromptr, uint sp, uint ad, uint st, uint32 *addrl, u
         uint32 *sizel, uint32 *sizeh)
 {
 	uint32 asd, sz, szd;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	asd = get_erom_ent(sih, eromptr, ER_VALID, ER_VALID);
 	if (((asd & ER_TAG1) != ER_ADD) ||
@@ -122,6 +127,8 @@ ai_scan(si_t *sih, void *regs, uint devid)
 	si_info_t *sii = SI_INFO(sih);
 	chipcregs_t *cc = (chipcregs_t *)regs;
 	uint32 erombase, *eromptr, *eromlim;
+	
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	erombase = R_REG(sii->osh, &cc->eromptr);
 
@@ -320,6 +327,8 @@ ai_setcoreidx(si_t *sih, uint coreidx)
 	uint32 wrap = sii->wrapba[coreidx];
 	void *regs;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+	
 	if (coreidx >= sii->numcores)
 		return (NULL);
 
@@ -365,6 +374,7 @@ ai_setcoreidx(si_t *sih, uint coreidx)
 int
 ai_numaddrspaces(si_t *sih)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 	return 2;
 }
 
@@ -374,6 +384,8 @@ ai_addrspace(si_t *sih, uint asidx)
 {
 	si_info_t *sii;
 	uint cidx;
+	
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	sii = SI_INFO(sih);
 	cidx = sii->curidx;
@@ -396,6 +408,8 @@ ai_addrspacesize(si_t *sih, uint asidx)
 	si_info_t *sii;
 	uint cidx;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+	
 	sii = SI_INFO(sih);
 	cidx = sii->curidx;
 
@@ -415,6 +429,8 @@ ai_flag(si_t *sih)
 {
 	si_info_t *sii;
 	aidmp_t *ai;
+	
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	sii = SI_INFO(sih);
 	ai = sii->curwrap;
@@ -425,6 +441,7 @@ ai_flag(si_t *sih)
 void
 ai_setint(si_t *sih, int siflag)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 }
 
 uint
@@ -432,6 +449,8 @@ ai_wrap_reg(si_t *sih, uint32 offset, uint32 mask, uint32 val)
 {
 	si_info_t *sii = SI_INFO(sih);
 	uint32 *map = (uint32 *) sii->curwrap;
+	
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (mask || val) {
 		uint32 w = R_REG(sii->osh, map+(offset/4));
@@ -448,6 +467,8 @@ ai_corevendor(si_t *sih)
 {
 	si_info_t *sii;
 	uint32 cia;
+	
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	sii = SI_INFO(sih);
 	cia = sii->cia[sii->curidx];
@@ -459,6 +480,8 @@ ai_corerev(si_t *sih)
 {
 	si_info_t *sii;
 	uint32 cib;
+	
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	sii = SI_INFO(sih);
 	cib = sii->cib[sii->curidx];
@@ -470,6 +493,8 @@ ai_iscoreup(si_t *sih)
 {
 	si_info_t *sii;
 	aidmp_t *ai;
+	
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	sii = SI_INFO(sih);
 	ai = sii->curwrap;
@@ -488,6 +513,8 @@ ai_corereg(si_t *sih, uint coreidx, uint regoff, uint mask, uint val)
 	uint intr_val = 0;
 	bool fast = FALSE;
 	si_info_t *sii;
+	
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	sii = SI_INFO(sih);
 
@@ -567,6 +594,8 @@ ai_core_disable(si_t *sih, uint32 bits)
 	si_info_t *sii;
 	volatile uint32 dummy;
 	aidmp_t *ai;
+	
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	sii = SI_INFO(sih);
 
@@ -592,6 +621,8 @@ ai_core_reset(si_t *sih, uint32 bits, uint32 resetbits)
 	si_info_t *sii;
 	aidmp_t *ai;
 	volatile uint32 dummy;
+	
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	sii = SI_INFO(sih);
 	ASSERT(GOODREGS(sii->curwrap));
@@ -618,6 +649,8 @@ ai_core_cflags_wo(si_t *sih, uint32 mask, uint32 val)
 	si_info_t *sii;
 	aidmp_t *ai;
 	uint32 w;
+	
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	sii = SI_INFO(sih);
 	ASSERT(GOODREGS(sii->curwrap));
@@ -638,6 +671,8 @@ ai_core_cflags(si_t *sih, uint32 mask, uint32 val)
 	aidmp_t *ai;
 	uint32 w;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+	
 	sii = SI_INFO(sih);
 	ASSERT(GOODREGS(sii->curwrap));
 	ai = sii->curwrap;
@@ -659,6 +694,8 @@ ai_core_sflags(si_t *sih, uint32 mask, uint32 val)
 	aidmp_t *ai;
 	uint32 w;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+	
 	sii = SI_INFO(sih);
 	ASSERT(GOODREGS(sii->curwrap));
 	ai = sii->curwrap;

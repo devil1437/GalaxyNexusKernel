@@ -174,6 +174,8 @@ dhd_common_init(osl_t *osh)
 {
 	dhd_cmn_t *cmn;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	/* Init global variables at run-time, not as part of the declaration.
 	 * This is required to support init/de-init of the driver. Initialization
 	 * of globals as part of the declaration results in non-deterministic
@@ -210,6 +212,8 @@ dhd_common_deinit(dhd_pub_t *dhd_pub, dhd_cmn_t *sa_cmn)
 	osl_t *osh;
 	dhd_cmn_t *cmn;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd_pub != NULL)
 		cmn = dhd_pub->cmn;
 	else
@@ -232,6 +236,8 @@ dhd_dump(dhd_pub_t *dhdp, char *buf, int buflen)
 
 	struct bcmstrbuf b;
 	struct bcmstrbuf *strbuf = &b;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	bcm_binit(strbuf, buf, buflen);
 
@@ -283,6 +289,8 @@ dhd_wl_ioctl_cmd(dhd_pub_t *dhd_pub, int cmd, void *arg, int len, uint8 set, int
 {
 	wl_ioctl_t ioc;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	ioc.cmd = cmd;
 	ioc.buf = arg;
 	ioc.len = len;
@@ -296,6 +304,8 @@ int
 dhd_wl_ioctl(dhd_pub_t *dhd_pub, int ifindex, wl_ioctl_t *ioc, void *buf, int len)
 {
 	int ret;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	dhd_os_proto_block(dhd_pub);
 
@@ -313,6 +323,8 @@ dhd_doiovar(dhd_pub_t *dhd_pub, const bcm_iovar_t *vi, uint32 actionid, const ch
 {
 	int bcmerror = 0;
 	int32 int_val = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 	DHD_TRACE(("%s: actionid = %d; name %s\n", __FUNCTION__, actionid, name));
@@ -527,6 +539,8 @@ exit:
 void
 dhd_store_conn_status(uint32 event, uint32 status, uint32 reason)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	/* Do not overwrite a WLC_E_PRUNE with a WLC_E_SET_SSID
 	 * because an encryption/rsn mismatch results in both events, and
 	 * the important information is in the WLC_E_PRUNE.
@@ -545,6 +559,8 @@ dhd_prec_enq(dhd_pub_t *dhdp, struct pktq *q, void *pkt, int prec)
 	void *p;
 	int eprec = -1;		/* precedence to evict from */
 	bool discard_oldest;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	/* Fast case, precedence queue is not full and we are also not
 	 * exceeding total queue length
@@ -594,6 +610,8 @@ dhd_iovar_op(dhd_pub_t *dhd_pub, const char *name,
 	const bcm_iovar_t *vi = NULL;
 	uint32 actionid;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	ASSERT(name);
@@ -641,6 +659,8 @@ int
 dhd_ioctl(dhd_pub_t * dhd_pub, dhd_ioctl_t *ioc, void * buf, uint buflen)
 {
 	int bcmerror = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -729,6 +749,8 @@ wl_show_host_event(wl_event_msg_t *event, void *event_data)
 	uchar *buf;
 	char err_msg[256], eabuf[ETHER_ADDR_STR_LEN];
 	uint event_type, flags, auth_type, datalen;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	event_type = ntoh32(event->event_type);
 	flags = ntoh16(event->flags);
@@ -972,6 +994,8 @@ wl_host_event(dhd_pub_t *dhd_pub, int *ifidx, void *pktdata,
 	uint16 flags;
 	int evlen;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (bcmp(BRCM_OUI, &pvt_data->bcm_hdr.oui[0], DOT11_OUI_LEN)) {
 		DHD_ERROR(("%s: mismatched OUI, bailing\n", __FUNCTION__));
 		return (BCME_ERROR);
@@ -1128,6 +1152,8 @@ wl_host_event(dhd_pub_t *dhd_pub, int *ifidx, void *pktdata,
 void
 wl_event_to_host_order(wl_event_msg_t * evt)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	/* Event struct members passed from dongle to host are stored in network
 	 * byte order. Convert all members to host-order.
 	 */
@@ -1146,6 +1172,8 @@ dhd_print_buf(void *pbuf, int len, int bytes_per_line)
 #ifdef DHD_DEBUG
 	int i, j = 0;
 	unsigned char *buf = pbuf;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (bytes_per_line == 0) {
 		bytes_per_line = len;
@@ -1172,6 +1200,8 @@ static int
 wl_pattern_atoh(char *src, char *dst)
 {
 	int i;
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (strncmp(src, "0x", 2) != 0 &&
 	    strncmp(src, "0X", 2) != 0) {
 		DHD_ERROR(("Mask invalid format. Needs to start with 0x\n"));
@@ -1205,6 +1235,8 @@ dhd_pktfilter_offload_enable(dhd_pub_t * dhd, char *arg, int enable, int master_
 	char				buf[128];
 	wl_pkt_filter_enable_t	enable_parm;
 	wl_pkt_filter_enable_t	* pkt_filterp;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (!arg)
 		return;
@@ -1281,6 +1313,8 @@ dhd_pktfilter_offload_set(dhd_pub_t * dhd, char *arg)
 	int					i = 0;
 	char				*arg_save = 0, *arg_org = 0;
 #define BUF_SIZE		2048
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (!arg)
 		return;
@@ -1413,6 +1447,8 @@ dhd_arp_offload_set(dhd_pub_t * dhd, int arp_mode)
 	char iovbuf[32];
 	int retcode;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	bcm_mkiovar("arp_ol", (char *)&arp_mode, 4, iovbuf, sizeof(iovbuf));
 	retcode = dhd_wl_ioctl_cmd(dhd, WLC_SET_VAR, iovbuf, sizeof(iovbuf), TRUE, 0);
 	retcode = retcode >= 0 ? 0 : retcode;
@@ -1429,6 +1465,8 @@ dhd_arp_offload_enable(dhd_pub_t * dhd, int arp_enable)
 {
 	char iovbuf[32];
 	int retcode;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	bcm_mkiovar("arpoe", (char *)&arp_enable, 4, iovbuf, sizeof(iovbuf));
 	retcode = dhd_wl_ioctl_cmd(dhd, WLC_SET_VAR, iovbuf, sizeof(iovbuf), TRUE, 0);
@@ -1448,6 +1486,8 @@ dhd_aoe_arp_clr(dhd_pub_t *dhd)
 	int iov_len = 0;
 	char iovbuf[128];
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd == NULL) return;
 
 	iov_len = bcm_mkiovar("arp_table_clear", 0, 0, iovbuf, sizeof(iovbuf));
@@ -1462,6 +1502,8 @@ dhd_aoe_hostip_clr(dhd_pub_t *dhd)
 	int iov_len = 0;
 	char iovbuf[128];
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd == NULL) return;
 
 	iov_len = bcm_mkiovar("arp_hostip_clear", 0, 0, iovbuf, sizeof(iovbuf));
@@ -1475,6 +1517,8 @@ dhd_arp_offload_add_ip(dhd_pub_t *dhd, uint32 ipaddr)
 	int iov_len = 0;
 	char iovbuf[32];
 	int retcode;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	iov_len = bcm_mkiovar("arp_hostip", (char *)&ipaddr, 4, iovbuf, sizeof(iovbuf));
 	retcode = dhd_wl_ioctl_cmd(dhd, WLC_SET_VAR, iovbuf, iov_len, TRUE, 0);
@@ -1494,6 +1538,8 @@ dhd_arp_get_arp_hostip_table(dhd_pub_t *dhd, void *buf, int buflen)
 	int iov_len = 0;
 	uint32 *ptr32 = buf;
 	bool clr_bottom = FALSE;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (!buf)
 		return -1;
@@ -1527,6 +1573,8 @@ dhd_arp_get_arp_hostip_table(dhd_pub_t *dhd, void *buf, int buflen)
 void
 dhd_sendup_event_common(dhd_pub_t *dhdp, wl_event_msg_t *event, void *data)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	switch (ntoh32(event->event_type)) {
 	case WLC_E_BTA_HCI_EVENT:
 		break;
@@ -1548,6 +1596,8 @@ dhd_iscan_allocate_buf(dhd_pub_t *dhd, iscan_buf_t **iscanbuf)
 {
 	iscan_buf_t *iscanbuf_alloc = 0;
 	iscan_buf_t *iscanbuf_head;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_ISCAN(("%s: Entered\n", __FUNCTION__));
 	dhd_iscan_lock();
@@ -1586,6 +1636,8 @@ dhd_iscan_free_buf(void *dhdp, iscan_buf_t *iscan_delete)
 	iscan_buf_t *iscanbuf_prv = 0;
 	iscan_buf_t *iscanbuf_cur;
 	dhd_pub_t *dhd = dhd_bus_pub(dhdp);
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_ISCAN(("%s: Entered\n", __FUNCTION__));
 
 	dhd_iscan_lock();
@@ -1625,6 +1677,8 @@ dhd_iscan_free_buf(void *dhdp, iscan_buf_t *iscan_delete)
 iscan_buf_t *
 dhd_iscan_result_buf(void)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	return iscan_chain;
 }
 
@@ -1637,6 +1691,8 @@ dhd_iscan_issue_request(void * dhdp, wl_iscan_params_t *pParams, uint32 size)
 	char iovar[] = "iscan";
 	uint32 allocSize = 0;
 	wl_ioctl_t ioctl;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (pParams) {
 		allocSize = (size + strlen(iovar) + 1);
@@ -1677,6 +1733,8 @@ dhd_iscan_get_partial_result(void *dhdp, uint *scan_count)
 	dhd_pub_t *dhd = dhd_bus_pub(dhdp);
 	int rc;
 	wl_ioctl_t ioctl;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_ISCAN(("%s: Enter\n", __FUNCTION__));
 
@@ -1733,6 +1791,8 @@ bool dhd_is_associated(dhd_pub_t *dhd, void *bss_buf, int *retval)
 	char bssid[6], zbuf[6];
 	int ret;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	bzero(bssid, 6);
 	bzero(zbuf, 6);
 
@@ -1770,6 +1830,8 @@ dhd_get_dtim_skip(dhd_pub_t *dhd)
 	int bcn_li_dtim;
 	int ret = -1;
 	int dtim_assoc = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if ((dhd->dtim_skip == 0) || (dhd->dtim_skip == 1))
 		bcn_li_dtim = 3;
@@ -1819,6 +1881,8 @@ exit:
 /* Check if HostAPD or WFD mode setup */
 bool dhd_check_ap_wfd_mode_set(dhd_pub_t *dhd)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 #ifdef  WL_CFG80211
 #ifndef WL_ENABLE_P2P_IF
 	/* To be back compatble with ICS MR1 release where p2p interface
@@ -1851,6 +1915,8 @@ dhd_pno_clean(dhd_pub_t *dhd)
 	int iov_len = 0;
 	int ret;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	/* Disable pfn */
 	iov_len = bcm_mkiovar("pfn", (char *)&pfn_enabled, 4, iovbuf, sizeof(iovbuf));
 	if ((ret = dhd_wl_ioctl_cmd(dhd, WLC_SET_VAR, iovbuf, sizeof(iovbuf), TRUE, 0)) >= 0) {
@@ -1878,6 +1944,8 @@ dhd_pno_enable(dhd_pub_t *dhd, int pfn_enabled)
 {
 	char iovbuf[128];
 	int ret = -1;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if ((!dhd) && ((pfn_enabled != 0) || (pfn_enabled != 1))) {
 		DHD_ERROR(("%s error exit\n", __FUNCTION__));
@@ -1926,6 +1994,8 @@ dhd_pno_set(dhd_pub_t *dhd, wlc_ssid_t* ssids_local, int nssid, ushort scan_fr,
 	wl_pfn_param_t pfn_param;
 	wl_pfn_t	pfn_element;
 	uint len = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s nssid=%d nchan=%d\n", __FUNCTION__, nssid, scan_fr));
 
@@ -2041,6 +2111,8 @@ dhd_pno_set_ex(dhd_pub_t *dhd, wl_pfn_t* ssidnet, int nssid, ushort pno_interval
 	wl_pfn_t	pfn_element;
 	uint len = 0;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s nssid=%d pno_interval=%d\n", __FUNCTION__, nssid, pno_interval));
 
 	if ((!dhd) && (!ssidnet)) {
@@ -2152,6 +2224,8 @@ dhd_pno_get_status(dhd_pub_t *dhd)
 {
 	int ret = -1;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (!dhd)
 		return ret;
 	else
@@ -2170,6 +2244,8 @@ int dhd_keep_alive_onoff(dhd_pub_t *dhd)
 	int					buf_len;
 	int					str_len;
 	int res 				= -1;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (dhd_check_ap_wfd_mode_set(dhd) == TRUE)
 		return (res);
@@ -2213,6 +2289,8 @@ wl_iw_parse_data_tlv(char** list_str, void *dst, int dst_size, const char token,
 	char* str = *list_str;
 	uint16 short_temp;
 	uint32 int_temp;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if ((list_str == NULL) || (*list_str == NULL) ||(bytes_left == NULL) || (*bytes_left < 0)) {
 		DHD_ERROR(("%s error paramters\n", __FUNCTION__));
@@ -2262,6 +2340,8 @@ wl_iw_parse_channel_list_tlv(char** list_str, uint16* channel_list,
 	char* str = *list_str;
 	int idx = 0;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if ((list_str == NULL) || (*list_str == NULL) ||(bytes_left == NULL) || (*bytes_left < 0)) {
 		DHD_ERROR(("%s error paramters\n", __FUNCTION__));
 		return -1;
@@ -2307,6 +2387,8 @@ wl_iw_parse_ssid_list_tlv(char** list_str, wlc_ssid_t* ssid, int max, int *bytes
 {
 	char* str;
 	int idx = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if ((list_str == NULL) || (*list_str == NULL) || (*bytes_left < 0)) {
 		DHD_ERROR(("%s error paramters\n", __FUNCTION__));
@@ -2380,6 +2462,8 @@ wl_iw_parse_ssid_list(char** list_str, wlc_ssid_t* ssid, int idx, int max)
 {
 	char* str, *ptr;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if ((list_str == NULL) || (*list_str == NULL))
 		return -1;
 
@@ -2422,6 +2506,8 @@ wl_iw_parse_channel_list(char** list_str, uint16* channel_list, int channel_num)
 	int val;
 	char* str;
 	char* endptr = NULL;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if ((list_str == NULL)||(*list_str == NULL))
 		return -1;

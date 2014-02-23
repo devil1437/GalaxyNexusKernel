@@ -87,6 +87,8 @@ dhdcdc_msg(dhd_pub_t *dhd)
 	dhd_prot_t *prot = dhd->prot;
 	int len = ltoh32(prot->msg.len) + sizeof(cdc_ioctl_t);
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	DHD_OS_WAKE_LOCK(dhd);
@@ -112,6 +114,8 @@ dhdcdc_cmplt(dhd_pub_t *dhd, uint32 id, uint32 len)
 	int cdc_len = len+sizeof(cdc_ioctl_t);
 	dhd_prot_t *prot = dhd->prot;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	do {
@@ -131,6 +135,8 @@ dhdcdc_query_ioctl(dhd_pub_t *dhd, int ifidx, uint cmd, void *buf, uint len, uin
 	void *info;
 	int ret = 0, retries = 0;
 	uint32 id, flags = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 	DHD_CTL(("%s: cmd %d len %d\n", __FUNCTION__, cmd, len));
@@ -219,6 +225,8 @@ dhdcdc_set_ioctl(dhd_pub_t *dhd, int ifidx, uint cmd, void *buf, uint len, uint8
 	int ret = 0;
 	uint32 flags, id;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 	DHD_CTL(("%s: cmd %d len %d\n", __FUNCTION__, cmd, len));
 
@@ -291,6 +299,8 @@ dhd_prot_ioctl(dhd_pub_t *dhd, int ifidx, wl_ioctl_t * ioc, void * buf, int len)
 		goto done;
 	}
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	ASSERT(len <= WLC_IOCTL_MAXLEN);
@@ -347,6 +357,8 @@ int
 dhd_prot_iovar_op(dhd_pub_t *dhdp, const char *name,
                   void *params, int plen, void *arg, int len, bool set)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	return BCME_UNSUPPORTED;
 }
 
@@ -362,6 +374,8 @@ dhd_wlfc_dump(dhd_pub_t *dhdp, struct bcmstrbuf *strbuf)
 	wlfc_mac_descriptor_t* mac_table;
 	wlfc_mac_descriptor_t* interfaces;
 	char* iftypes[] = {"STA", "AP", "WDS", "p2pGO", "p2pCL"};
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (wlfc == NULL) {
 		bcm_bprintf(strbuf, "wlfc not initialized yet\n");
@@ -620,6 +634,8 @@ dhd_wlfc_hanger_create(osl_t *osh, int max_items)
 	/* allow only up to a specific size for now */
 	ASSERT(max_items == WLFC_HANGER_MAXITEMS);
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if ((hanger = (wlfc_hanger_t*)MALLOC(osh, WLFC_HANGER_SIZE(max_items))) == NULL)
 		return NULL;
 
@@ -637,6 +653,8 @@ dhd_wlfc_hanger_delete(osl_t *osh, void* hanger)
 {
 	wlfc_hanger_t* h = (wlfc_hanger_t*)hanger;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (h) {
 		MFREE(osh, h, WLFC_HANGER_SIZE(h->max_items));
 		return BCME_OK;
@@ -649,6 +667,8 @@ dhd_wlfc_hanger_get_free_slot(void* hanger)
 {
 	int i;
 	wlfc_hanger_t* h = (wlfc_hanger_t*)hanger;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (h) {
 		for (i = 0; i < h->max_items; i++) {
@@ -665,6 +685,8 @@ dhd_wlfc_hanger_pushpkt(void* hanger, void* pkt, uint32 slot_id)
 {
 	int rc = BCME_OK;
 	wlfc_hanger_t* h = (wlfc_hanger_t*)hanger;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (h && (slot_id < WLFC_HANGER_MAXITEMS)) {
 		if (h->items[slot_id].state == WLFC_HANGER_ITEM_STATE_FREE) {
@@ -688,6 +710,8 @@ dhd_wlfc_hanger_poppkt(void* hanger, uint32 slot_id, void** pktout, int remove_f
 {
 	int rc = BCME_OK;
 	wlfc_hanger_t* h = (wlfc_hanger_t*)hanger;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	/* this packet was not pushed at the time it went to the firmware */
 	if (slot_id == WLFC_HANGER_MAXITEMS)
@@ -725,6 +749,8 @@ _dhd_wlfc_pushheader(athost_wl_status_info_t* ctx, void* p, bool tim_signal,
 	uint8 tim_signal_len = 0;
 
 	struct bdc_header *h;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (tim_signal) {
 		tim_signal_len = 1 + 1 + WLFC_CTL_VALUE_LEN_PENDING_TRAFFIC_BMP;
@@ -774,6 +800,8 @@ _dhd_wlfc_pullheader(athost_wl_status_info_t* ctx, void* pktbuf)
 {
 	struct bdc_header *h;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (PKTLEN(ctx->osh, pktbuf) < BDC_HEADER_LEN) {
 		WLFC_DBGMESG(("%s: rx data too short (%d < %d)\n", __FUNCTION__,
 		           PKTLEN(ctx->osh, pktbuf), BDC_HEADER_LEN));
@@ -795,6 +823,8 @@ _dhd_wlfc_find_table_entry(athost_wl_status_info_t* ctx, void* p)
 	wlfc_mac_descriptor_t* table = ctx->destination_entries.nodes;
 	uint8 ifid = DHD_PKTTAG_IF(PKTTAG(p));
 	uint8* dstn = DHD_PKTTAG_DSTN(PKTTAG(p));
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	/* no lookup necessary, only if this packet belongs to STA interface */
 	if (((ctx->destination_entries.interfaces[ifid].iftype == WLC_E_IF_ROLE_STA) ||
@@ -833,6 +863,8 @@ _dhd_wlfc_rollback_packet_toq(athost_wl_status_info_t* ctx,
 	void* pktout;
 	int rc = BCME_OK;
 	int prec;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	entry = _dhd_wlfc_find_table_entry(ctx, p);
 	prec = DHD_PKTTAG_FIFO(PKTTAG(p));
@@ -891,6 +923,8 @@ _dhd_wlfc_rollback_packet_toq(athost_wl_status_info_t* ctx,
 static void
 _dhd_wlfc_flow_control_check(athost_wl_status_info_t* ctx, struct pktq* pq, uint8 if_id)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if ((pq->len <= WLFC_FLOWCONTROL_LOWATER) && (ctx->hostif_flow_state[if_id] == ON)) {
 		/* start traffic */
 		ctx->hostif_flow_state[if_id] = OFF;
@@ -925,6 +959,8 @@ _dhd_wlfc_send_signalonly_packet(athost_wl_status_info_t* ctx, wlfc_mac_descript
 	void* p = NULL;
 	int dummylen = ((dhd_pub_t *)ctx->dhdp)->hdrlen+ 12;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	/* allocate a dummy packet */
 	p = PKTGET(ctx->osh, dummylen, TRUE);
 	if (p) {
@@ -954,6 +990,8 @@ _dhd_wlfc_traffic_pending_check(athost_wl_status_info_t* ctx, wlfc_mac_descripto
 	int prec)
 {
 	bool rc = FALSE;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (entry->state == WLFC_STATE_CLOSE) {
 		if ((pktq_plen(&entry->psq, (prec << 1)) == 0) &&
@@ -993,6 +1031,8 @@ _dhd_wlfc_enque_suppressed(athost_wl_status_info_t* ctx, int prec, void* p)
 {
 	wlfc_mac_descriptor_t* entry;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	entry = _dhd_wlfc_find_table_entry(ctx, p);
 	if (entry == NULL) {
 		WLFC_DBGMESG(("Error: %s():%d\n", __FUNCTION__, __LINE__));
@@ -1024,6 +1064,8 @@ _dhd_wlfc_pretx_pktprocess(athost_wl_status_info_t* ctx,
 	bool send_tim_update = FALSE;
 	uint32 htod = 0;
 	uint8 free_ctr;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	*slot = hslot;
 
@@ -1109,6 +1151,8 @@ static int
 _dhd_wlfc_is_destination_closed(athost_wl_status_info_t* ctx,
 	wlfc_mac_descriptor_t* entry, int prec)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (ctx->destination_entries.interfaces[entry->interface_id].iftype ==
 		WLC_E_IF_ROLE_P2P_GO) {
 		/* - destination interface is of type p2p GO.
@@ -1141,6 +1185,8 @@ _dhd_wlfc_deque_delayedq(athost_wl_status_info_t* ctx,
 	void* p = NULL;
 	int pout;
 	int i;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	*entry_out = NULL;
 	token_pos = ctx->token_pos[prec];
@@ -1218,6 +1264,8 @@ _dhd_wlfc_deque_sendq(athost_wl_status_info_t* ctx, int prec, uint8* ac_credit_s
 	wlfc_mac_descriptor_t* entry;
 	void* p;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	/* most cases a packet will count against FIFO credit */
 	*ac_credit_spent = 1;
 
@@ -1289,6 +1337,8 @@ _dhd_wlfc_mac_entry_update(athost_wl_status_info_t* ctx, wlfc_mac_descriptor_t* 
 {
 	int rc = BCME_OK;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (action == eWLFC_MAC_ENTRY_ACTION_ADD) {
 		entry->occupied = 1;
 		entry->state = WLFC_STATE_OPEN;
@@ -1318,6 +1368,8 @@ _dhd_wlfc_borrow_credit(athost_wl_status_info_t* ctx, uint8 available_credit_map
 	int lender_ac;
 	int rc = BCME_ERROR;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (ctx == NULL || available_credit_map == 0) {
 		WLFC_DBGMESG(("Error: %s():%d\n", __FUNCTION__, __LINE__));
 		return BCME_BADARG;
@@ -1344,6 +1396,8 @@ dhd_wlfc_interface_entry_update(void* state,
 	athost_wl_status_info_t* ctx = (athost_wl_status_info_t*)state;
 	wlfc_mac_descriptor_t* entry;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (ifid >= WLFC_MAX_IFNUM)
 		return BCME_BADARG;
 
@@ -1355,6 +1409,8 @@ int
 dhd_wlfc_FIFOcreditmap_update(void* state, uint8* credits)
 {
 	athost_wl_status_info_t* ctx = (athost_wl_status_info_t*)state;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	/* update the AC FIFO credit map */
 	ctx->FIFO_credit[0] = credits[0];
@@ -1372,6 +1428,8 @@ int
 dhd_wlfc_enque_sendq(void* state, int prec, void* p)
 {
 	athost_wl_status_info_t* ctx = (athost_wl_status_info_t*)state;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if ((state == NULL) ||
 		/* prec = AC_COUNT is used for bc/mc queue */
@@ -1402,6 +1460,8 @@ _dhd_wlfc_handle_packet_commit(athost_wl_status_info_t* ctx, int ac,
 {
 	uint32 hslot;
 	int	rc;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	/*
 		if ac_fifo_credit_spent = 0
@@ -1460,6 +1520,8 @@ dhd_wlfc_commit_packets(void* state, f_commitpkt_t fcommit, void* commit_ctx)
 	int credit_count = 0;
 	int bus_retry_count = 0;
 	uint8 ac_available = 0;  /* Bitmask for 4 ACs + BC/MC */
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if ((state == NULL) ||
 		(fcommit == NULL)) {
@@ -1674,6 +1736,8 @@ dhd_wlfc_find_mac_desc_id_from_mac(dhd_pub_t *dhdp, uint8* ea)
 		((athost_wl_status_info_t*)dhdp->wlfc_state)->destination_entries.nodes;
 	uint8 table_index;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (ea != NULL) {
 		for (table_index = 0; table_index < WLFC_MAC_DESC_TABLE_SIZE; table_index++) {
 			if ((memcmp(ea, &table[table_index].ea[0], ETHER_ADDR_LEN) == 0) &&
@@ -1691,6 +1755,8 @@ dhd_wlfc_txcomplete(dhd_pub_t *dhd, void *txp, bool success)
 		dhd->wlfc_state;
 	void* p;
 	int fifo_id;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (DHD_PKTTAG_SIGNALONLY(PKTTAG(txp))) {
 #ifdef PROP_TXSTATUS_DEBUG
@@ -1748,6 +1814,8 @@ dhd_wlfc_txstatus_update(dhd_pub_t *dhd, uint8* pkt_info)
 	wlfc_mac_descriptor_t* entry = NULL;
 	athost_wl_status_info_t* wlfc = (athost_wl_status_info_t*)
 		dhd->wlfc_state;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	memcpy(&status, pkt_info, sizeof(uint32));
 	status_flag = WL_TXSTATUS_GET_FLAGS(status);
@@ -1873,6 +1941,8 @@ dhd_wlfc_fifocreditback_indicate(dhd_pub_t *dhd, uint8* credits)
 	int i;
 	athost_wl_status_info_t* wlfc = (athost_wl_status_info_t*)
 		dhd->wlfc_state;
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	for (i = 0; i < WLFC_CTL_VALUE_LEN_FIFO_CREDITBACK; i++) {
 #ifdef PROP_TXSTATUS_DEBUG
 		wlfc->stats.fifo_credits_back[i] += credits[i];
@@ -1912,6 +1982,8 @@ dhd_wlfc_fifocreditback_indicate(dhd_pub_t *dhd, uint8* credits)
 static int
 dhd_wlfc_rssi_indicate(dhd_pub_t *dhd, uint8* rssi)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	(void)dhd;
 	(void)rssi;
 	return BCME_OK;
@@ -1928,6 +2000,8 @@ dhd_wlfc_mac_table_update(dhd_pub_t *dhd, uint8* value, uint8 type)
 	uint8 table_index;
 	uint8 ifid;
 	uint8* ea;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	WLFC_DBGMESG(("%s(), mac [%02x:%02x:%02x:%02x:%02x:%02x],%s,idx:%d,id:0x%02x\n",
 		__FUNCTION__, value[2], value[3], value[4], value[5], value[6], value[7],
@@ -1995,6 +2069,8 @@ dhd_wlfc_psmode_update(dhd_pub_t *dhd, uint8* value, uint8 type)
 	uint8 mac_handle = value[0];
 	int i;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	table = wlfc->destination_entries.nodes;
 	desc = &table[WLFC_MAC_DESC_GET_LOOKUP_INDEX(mac_handle)];
 	if (desc->occupied) {
@@ -2030,6 +2106,8 @@ dhd_wlfc_interface_update(dhd_pub_t *dhd, uint8* value, uint8 type)
 	wlfc_mac_descriptor_t* table;
 	uint8 if_id = value[0];
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (if_id < WLFC_MAX_IFNUM) {
 		table = wlfc->destination_entries.interfaces;
 		if (table[if_id].occupied) {
@@ -2059,6 +2137,8 @@ dhd_wlfc_credit_request(dhd_pub_t *dhd, uint8* value)
 	uint8 mac_handle;
 	uint8 credit;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	table = wlfc->destination_entries.nodes;
 	mac_handle = value[1];
 	credit = value[0];
@@ -2084,6 +2164,8 @@ dhd_wlfc_packet_request(dhd_pub_t *dhd, uint8* value)
 	wlfc_mac_descriptor_t* desc;
 	uint8 mac_handle;
 	uint8 packet_count;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	table = wlfc->destination_entries.nodes;
 	mac_handle = value[1];
@@ -2112,6 +2194,8 @@ dhd_wlfc_parse_header_info(dhd_pub_t *dhd, void* pktbuf, int tlv_hdr_len)
 	athost_wl_status_info_t* wlfc = (athost_wl_status_info_t*)
 		dhd->wlfc_state;
 	tmpbuf = (uint8*)PKTDATA(dhd->osh, pktbuf);
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (remainder) {
 		while ((processed < (WLFC_MAX_PENDING_DATALEN * 2)) && (remainder > 0)) {
 			type = tmpbuf[processed];
@@ -2176,6 +2260,8 @@ dhd_wlfc_init(dhd_pub_t *dhd)
 		WLFC_FLAGS_CREDIT_STATUS_SIGNALS |
 		WLFC_FLAGS_HOST_PROPTXSTATUS_ACTIVE : 0;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	dhd->wlfc_state  = NULL;
 
 	/*
@@ -2204,6 +2290,8 @@ dhd_wlfc_enable(dhd_pub_t *dhd)
 {
 	int i;
 	athost_wl_status_info_t* wlfc;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (!dhd->wlfc_enabled || dhd->wlfc_state)
 		return BCME_OK;
@@ -2264,6 +2352,8 @@ dhd_wlfc_cleanup(dhd_pub_t *dhd)
 	wlfc_mac_descriptor_t* table;
 	wlfc_hanger_t* h;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd->wlfc_state == NULL)
 		return;
 
@@ -2302,6 +2392,8 @@ dhd_wlfc_deinit(dhd_pub_t *dhd)
 	athost_wl_status_info_t* wlfc = (athost_wl_status_info_t*)
 		dhd->wlfc_state;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd->wlfc_state == NULL)
 		return;
 
@@ -2331,6 +2423,8 @@ dhd_wlfc_deinit(dhd_pub_t *dhd)
 void
 dhd_prot_dump(dhd_pub_t *dhdp, struct bcmstrbuf *strbuf)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	bcm_bprintf(strbuf, "Protocol CDC: reqid %d\n", dhdp->prot->reqid);
 #ifdef PROP_TXSTATUS
 	if (dhdp->wlfc_state)
@@ -2344,6 +2438,8 @@ dhd_prot_hdrpush(dhd_pub_t *dhd, int ifidx, void *pktbuf)
 #ifdef BDC
 	struct bdc_header *h;
 #endif /* BDC */
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -2372,6 +2468,8 @@ dhd_prot_hdrpull(dhd_pub_t *dhd, int *ifidx, void *pktbuf)
 #ifdef BDC
 	struct bdc_header *h;
 #endif
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -2442,6 +2540,8 @@ dhd_prot_attach(dhd_pub_t *dhd)
 {
 	dhd_prot_t *cdc;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (!(cdc = (dhd_prot_t *)DHD_OS_PREALLOC(dhd->osh, DHD_PREALLOC_PROT,
 		sizeof(dhd_prot_t)))) {
 		DHD_ERROR(("%s: kmalloc failed\n", __FUNCTION__));
@@ -2474,6 +2574,8 @@ fail:
 void
 dhd_prot_detach(dhd_pub_t *dhd)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 #ifdef PROP_TXSTATUS
 	dhd_wlfc_deinit(dhd);
 #endif
@@ -2486,6 +2588,8 @@ dhd_prot_detach(dhd_pub_t *dhd)
 void
 dhd_prot_dstats(dhd_pub_t *dhd)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	/* No stats from dongle added yet, copy bus stats */
 	dhd->dstats.tx_packets = dhd->tx_packets;
 	dhd->dstats.tx_errors = dhd->tx_errors;
@@ -2501,6 +2605,8 @@ dhd_prot_init(dhd_pub_t *dhd)
 {
 	int ret = 0;
 	wlc_rev_info_t revinfo;
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 
@@ -2530,5 +2636,7 @@ done:
 void
 dhd_prot_stop(dhd_pub_t *dhd)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	/* Nothing to do for CDC */
 }

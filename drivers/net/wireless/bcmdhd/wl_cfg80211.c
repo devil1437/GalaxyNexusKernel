@@ -39,6 +39,7 @@
 
 #include <dngl_stats.h>
 #include <dhd.h>
+#include <dhd_dbg.h>
 #include <dhdioctl.h>
 #include <wlioctl.h>
 #include <dhd_cfg80211.h>
@@ -587,6 +588,8 @@ wl_cfg80211_default_mgmt_stypes[NUM_NL80211_IFTYPES] = {
 
 static void swap_key_from_BE(struct wl_wsec_key *key)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	key->index = htod32(key->index);
 	key->len = htod32(key->len);
 	key->algo = htod32(key->algo);
@@ -598,6 +601,8 @@ static void swap_key_from_BE(struct wl_wsec_key *key)
 
 static void swap_key_to_BE(struct wl_wsec_key *key)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	key->index = dtoh32(key->index);
 	key->len = dtoh32(key->len);
 	key->algo = dtoh32(key->algo);
@@ -618,6 +623,8 @@ wl_validate_wps_ie(char *wps_ie, bool *pbc)
 	u16 subelt_len;
 	u16 val;
 	u8 *valptr = (uint8*) &val;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG(("wps_ie len=%d\n", len));
 
@@ -685,6 +692,8 @@ wl_validate_wps_ie(char *wps_ie, bool *pbc)
 
 static chanspec_t wl_cfg80211_get_shared_freq(struct wiphy *wiphy)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (vsdb_supported) {
 		return wf_chspec_aton(WL_P2P_TEMP_CHAN);
 	}
@@ -725,6 +734,8 @@ static struct net_device* wl_cfg80211_add_monitor_if(char *name)
 	int ret = 0;
 	struct net_device* ndev = NULL;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	ret = dhd_add_monitor(name, &ndev);
 	WL_INFO(("wl_cfg80211_add_monitor_if net device returned: 0x%p\n", ndev));
 	return ndev;
@@ -748,6 +759,8 @@ wl_cfg80211_add_virtual_iface(struct wiphy *wiphy, char *name,
 	struct ether_addr primary_mac;
 	int (*net_attach)(void *dhdp, int ifidx);
 	bool rollback_lock = false;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	/* Use primary I/F for sending cmds down to firmware */
 	_ndev = wl_to_prmry_ndev(wl);
@@ -919,6 +932,8 @@ wl_cfg80211_del_virtual_iface(struct wiphy *wiphy, struct net_device *dev)
 	struct wl_priv *wl = wiphy_priv(wiphy);
 	s32 timeout = -1;
 	s32 ret = 0;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("Enter\n"));
 
 	if (wl->p2p_net == dev) {
@@ -987,6 +1002,8 @@ wl_cfg80211_change_virtual_iface(struct wiphy *wiphy, struct net_device *ndev,
 	s32 mode = 0;
 	chanspec_t chspec;
 	struct wl_priv *wl = wiphy_priv(wiphy);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG(("Enter type %d\n", type));
 	switch (type) {
@@ -1074,6 +1091,8 @@ wl_cfg80211_notify_ifadd(struct net_device *ndev, s32 idx, s32 bssidx,
 {
 	struct wl_priv *wl = wlcfg_drv_priv;
 	s32 ret = BCME_OK;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("Enter"));
 	if (!ndev) {
 		WL_ERR(("net is NULL\n"));
@@ -1102,6 +1121,8 @@ wl_cfg80211_notify_ifdel(void)
 {
 	struct wl_priv *wl = wlcfg_drv_priv;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("Enter \n"));
 	wl_clr_p2p_status(wl, IF_DELETING);
 	wake_up_interruptible(&wl->netif_change_event);
@@ -1114,6 +1135,8 @@ wl_cfg80211_ifdel_ops(struct net_device *ndev)
 	struct wl_priv *wl = wlcfg_drv_priv;
 	bool rollback_lock = false;
 	s32 index = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!ndev || !ndev->name) {
 		WL_ERR(("net is NULL\n"));
@@ -1160,6 +1183,8 @@ wl_cfg80211_is_progress_ifadd(void)
 {
 	s32 is_progress = 0;
 	struct wl_priv *wl = wlcfg_drv_priv;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (wl_get_p2p_status(wl, IF_ADD))
 		is_progress = 1;
 	return is_progress;
@@ -1170,6 +1195,8 @@ wl_cfg80211_is_progress_ifchange(void)
 {
 	s32 is_progress = 0;
 	struct wl_priv *wl = wlcfg_drv_priv;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (wl_get_p2p_status(wl, IF_CHANGING))
 		is_progress = 1;
 	return is_progress;
@@ -1180,6 +1207,8 @@ s32
 wl_cfg80211_notify_ifchange(void)
 {
 	struct wl_priv *wl = wlcfg_drv_priv;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (wl_get_p2p_status(wl, IF_CHANGING)) {
 		wl_set_p2p_status(wl, IF_CHANGED);
 		wake_up_interruptible(&wl->netif_change_event);
@@ -1196,6 +1225,8 @@ static void wl_scan_prep(struct wl_scan_params *params, struct cfg80211_scan_req
 	s32 i, offset;
 	char *ptr;
 	wlc_ssid_t ssid;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	memcpy(&params->bssid, &ether_bcast, ETHER_ADDR_LEN);
 	params->bss_type = DOT11_BSSTYPE_ANY;
@@ -1296,6 +1327,8 @@ wl_run_iscan(struct wl_iscan_ctrl *iscan, struct cfg80211_scan_request *request,
 	struct wl_iscan_params *params;
 	s32 err = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (request != NULL) {
 		n_channels = request->n_channels;
 		n_ssids = request->n_ssids;
@@ -1346,6 +1379,8 @@ static s32 wl_do_iscan(struct wl_priv *wl, struct cfg80211_scan_request *request
 	s32 passive_scan;
 	s32 err = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	iscan->state = WL_ISCAN_STATE_SCANING;
 
 	passive_scan = wl->active_scan ? 0 : 1;
@@ -1370,6 +1405,8 @@ wl_get_valid_channels(struct net_device *ndev, u8 *valid_chan_list, s32 size)
 	s32 err = BCME_OK;
 	if (valid_chan_list == NULL || size <= 0)
 		return -ENOMEM;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	memset(valid_chan_list, 0, size);
 	list = (wl_uint32_list_t *)(void *) valid_chan_list;
@@ -1401,6 +1438,8 @@ wl_run_escan(struct wl_priv *wl, struct net_device *ndev,
 	u16 *default_chan_list = NULL;
 	wl_uint32_list_t *list;
 	struct net_device *dev = NULL;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("Enter \n"));
 
 
@@ -1519,6 +1558,8 @@ wl_do_escan(struct wl_priv *wl, struct wiphy *wiphy, struct net_device *ndev,
 	s32 err = BCME_OK;
 	s32 passive_scan;
 	wl_scan_results_t *results;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_SCAN(("Enter \n"));
 
 	mutex_lock(&wl->usr_sync);
@@ -1561,6 +1602,8 @@ __wl_cfg80211_scan(struct wiphy *wiphy, struct net_device *ndev,
 	s32 i;
 	u32 wpsie_len = 0;
 	u8 wpsie[IE_MAX_LEN];
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	/* If scan req comes for p2p0, send it over primary I/F
 	 * Scan results will be delivered corresponding to cfg80211_scan_request
@@ -1743,6 +1786,8 @@ wl_cfg80211_scan(struct wiphy *wiphy, struct net_device *ndev,
 	s32 err = 0;
 	struct wl_priv *wl = wiphy_priv(wiphy);
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("Enter \n"));
 	CHECK_SYS_UP(wl);
 
@@ -1767,6 +1812,8 @@ static s32 wl_set_rts(struct net_device *dev, u32 rts_threshold)
 {
 	s32 err = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	err = wldev_iovar_setint(dev, "rtsthresh", rts_threshold);
 	if (unlikely(err)) {
 		WL_ERR(("Error (%d)\n", err));
@@ -1778,6 +1825,8 @@ static s32 wl_set_rts(struct net_device *dev, u32 rts_threshold)
 static s32 wl_set_frag(struct net_device *dev, u32 frag_threshold)
 {
 	s32 err = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	err = wldev_iovar_setint_bsscfg(dev, "fragthresh", frag_threshold, 0);
 	if (unlikely(err)) {
@@ -1791,6 +1840,8 @@ static s32 wl_set_retry(struct net_device *dev, u32 retry, bool l)
 {
 	s32 err = 0;
 	u32 cmd = (l ? WLC_SET_LRL : WLC_SET_SRL);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	retry = htod32(retry);
 	err = wldev_ioctl(dev, cmd, &retry, sizeof(retry), false);
@@ -1806,6 +1857,8 @@ static s32 wl_cfg80211_set_wiphy_params(struct wiphy *wiphy, u32 changed)
 	struct wl_priv *wl = (struct wl_priv *)wiphy_priv(wiphy);
 	struct net_device *ndev = wl_to_prmry_ndev(wl);
 	s32 err = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	CHECK_SYS_UP(wl);
 	WL_DBG(("Enter\n"));
@@ -1853,6 +1906,8 @@ wl_cfg80211_join_ibss(struct wiphy *wiphy, struct net_device *dev,
 	s32 wsec = 0;
 	s32 bcnprd;
 	s32 err = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("In\n"));
 	CHECK_SYS_UP(wl);
@@ -2007,6 +2062,8 @@ static s32 wl_cfg80211_leave_ibss(struct wiphy *wiphy, struct net_device *dev)
 	s32 err = 0;
 	u8 *curbssid;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("Enter\n"));
 
 	CHECK_SYS_UP(wl);
@@ -2045,6 +2102,8 @@ wl_set_wpa_version(struct net_device *dev, struct cfg80211_connect_params *sme)
 	s32 err = 0;
 	s32 bssidx = wl_cfgp2p_find_idx(wl, dev);
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (sme->crypto.wpa_versions & NL80211_WPA_VERSION_1)
 		val = WPA_AUTH_PSK | WPA_AUTH_UNSPECIFIED;
 	else if (sme->crypto.wpa_versions & NL80211_WPA_VERSION_2)
@@ -2074,6 +2133,8 @@ wl_set_auth_type(struct net_device *dev, struct cfg80211_connect_params *sme)
 	s32 val = 0;
 	s32 err = 0;
 	s32 bssidx = wl_cfgp2p_find_idx(wl, dev);
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	switch (sme->auth_type) {
 	case NL80211_AUTHTYPE_OPEN_SYSTEM:
 		val = WL_AUTH_OPEN_SYSTEM;
@@ -2114,6 +2175,8 @@ wl_set_set_cipher(struct net_device *dev, struct cfg80211_connect_params *sme)
 	s32 gval = 0;
 	s32 err = 0;
 	s32 bssidx = wl_cfgp2p_find_idx(wl, dev);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (sme->crypto.n_ciphers_pairwise) {
 		switch (sme->crypto.ciphers_pairwise[0]) {
@@ -2192,6 +2255,8 @@ wl_set_key_mgmt(struct net_device *dev, struct cfg80211_connect_params *sme)
 	s32 err = 0;
 	s32 bssidx = wl_cfgp2p_find_idx(wl, dev);
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (sme->crypto.n_akm_suites) {
 		err = wldev_iovar_getint(dev, "wpa_auth", &val);
 		if (unlikely(err)) {
@@ -2249,6 +2314,8 @@ wl_set_set_sharedkey(struct net_device *dev,
 	s32 val;
 	s32 err = 0;
 	s32 bssidx = wl_cfgp2p_find_idx(wl, dev);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG(("key len (%d)\n", sme->key_len));
 	if (sme->key_len) {
@@ -2325,6 +2392,8 @@ wl_cfg80211_connect(struct wiphy *wiphy, struct net_device *dev,
 	u32 chan_cnt = 0;
 	u8 wpsie[IE_MAX_LEN];
 	struct ether_addr bssid;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG(("In\n"));
 	CHECK_SYS_UP(wl);
@@ -2588,6 +2657,8 @@ wl_cfg80211_set_tx_power(struct wiphy *wiphy,
 	s32 err = 0;
 	s32 disable = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	CHECK_SYS_UP(wl);
 	switch (type) {
 	case NL80211_TX_POWER_AUTOMATIC:
@@ -2637,6 +2708,8 @@ static s32 wl_cfg80211_get_tx_power(struct wiphy *wiphy, s32 *dbm)
 	u8 result;
 	s32 err = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	CHECK_SYS_UP(wl);
 	err = wldev_iovar_getint(ndev, "qtxpower", &txpwrdbm);
 	if (unlikely(err)) {
@@ -2658,6 +2731,8 @@ wl_cfg80211_config_default_key(struct wiphy *wiphy, struct net_device *dev,
 	s32 wsec;
 	s32 err = 0;
 	s32 bssidx = wl_cfgp2p_find_idx(wl, dev);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG(("key index (%d)\n", key_idx));
 	CHECK_SYS_UP(wl);
@@ -2690,6 +2765,8 @@ wl_add_keyext(struct wiphy *wiphy, struct net_device *dev,
 	s32 mode = wl_get_mode_by_netdev(wl, dev);
 	memset(&key, 0, sizeof(key));
 	key.index = (u32) key_idx;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!ETHER_ISMULTI(mac_addr))
 		memcpy((char *)&key.ea, (void *)mac_addr, ETHER_ADDR_LEN);
@@ -2781,6 +2858,8 @@ wl_cfg80211_add_key(struct wiphy *wiphy, struct net_device *dev,
 	s32 bssidx = 0;
 	struct wl_priv *wl = wiphy_priv(wiphy);
 	s32 mode = wl_get_mode_by_netdev(wl, dev);
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("key index (%d)\n", key_idx));
 	CHECK_SYS_UP(wl);
 
@@ -2874,6 +2953,8 @@ wl_cfg80211_del_key(struct wiphy *wiphy, struct net_device *dev,
 	s32 err = 0;
 	s32 bssidx = wl_cfgp2p_find_idx(wl, dev);
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("Enter\n"));
 	CHECK_SYS_UP(wl);
 	memset(&key, 0, sizeof(key));
@@ -2913,6 +2994,8 @@ wl_cfg80211_get_key(struct wiphy *wiphy, struct net_device *dev,
 	s32 wsec;
 	s32 err = 0;
 	s32 bssidx = wl_cfgp2p_find_idx(wl, dev);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG(("key index (%d)\n", key_idx));
 	CHECK_SYS_UP(wl);
@@ -2960,6 +3043,8 @@ static s32
 wl_cfg80211_config_default_mgmt_key(struct wiphy *wiphy,
 	struct net_device *dev, u8 key_idx)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_INFO(("Not supported\n"));
 	return -EOPNOTSUPP;
 }
@@ -2978,6 +3063,8 @@ wl_cfg80211_get_station(struct wiphy *wiphy, struct net_device *dev,
 	s8 eabuf[ETHER_ADDR_STR_LEN];
 #endif
 	dhd_pub_t *dhd =  (dhd_pub_t *)(wl->pub);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	CHECK_SYS_UP(wl);
 	if (wl_get_mode_by_netdev(wl, dev) == WL_MODE_AP) {
@@ -3073,6 +3160,8 @@ int wl_cfg80211_update_power_mode(struct net_device *dev)
 	int pm = -1;
 	int err;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	err = wldev_ioctl(dev, WLC_GET_PM, &pm, sizeof(pm), false);
 	if (err || (pm == -1)) {
 		WL_ERR(("error (%d)\n", err));
@@ -3093,6 +3182,8 @@ wl_cfg80211_set_power_mgmt(struct wiphy *wiphy, struct net_device *dev,
 	s32 err = 0;
 	struct wl_priv *wl = wiphy_priv(wiphy);
 	dhd_pub_t *dhd =  (dhd_pub_t *)(wl->pub);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	CHECK_SYS_UP(wl);
 
@@ -3118,6 +3209,8 @@ wl_cfg80211_set_power_mgmt(struct wiphy *wiphy, struct net_device *dev,
 static __used u32 wl_find_msb(u16 bit16)
 {
 	u32 ret = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (bit16 & 0xff00) {
 		ret += 8;
@@ -3148,6 +3241,8 @@ static s32 wl_cfg80211_resume(struct wiphy *wiphy)
 	struct net_device *ndev = wl_to_prmry_ndev(wl);
 	s32 err = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (unlikely(!wl_get_drv_status(wl, READY, ndev))) {
 		WL_INFO(("device is not ready\n"));
 		return 0;
@@ -3169,6 +3264,8 @@ static s32 wl_cfg80211_suspend(struct wiphy *wiphy)
 	struct net_info *iter, *next;
 	struct net_device *ndev = wl_to_prmry_ndev(wl);
 	unsigned long flags;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (unlikely(!wl_get_drv_status(wl, READY, ndev))) {
 		WL_INFO(("device is not ready : status (%d)\n",
@@ -3204,6 +3301,8 @@ wl_update_pmklist(struct net_device *dev, struct wl_pmk_list *pmk_list,
 	int i, j;
 	struct wl_priv *wl = wlcfg_drv_priv;
 	struct net_device *primary_dev = wl_to_prmry_ndev(wl);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!pmk_list) {
 		printk("pmk_list is NULL\n");
@@ -3242,6 +3341,8 @@ wl_cfg80211_set_pmksa(struct wiphy *wiphy, struct net_device *dev,
 	s32 err = 0;
 	int i;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	CHECK_SYS_UP(wl);
 	for (i = 0; i < wl->pmk_list->pmkids.npmkid; i++)
 		if (!memcmp(pmksa->bssid, &wl->pmk_list->pmkids.pmkid[i].BSSID,
@@ -3278,6 +3379,8 @@ wl_cfg80211_del_pmksa(struct wiphy *wiphy, struct net_device *dev,
 	struct _pmkid_list pmkid;
 	s32 err = 0;
 	int i;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	CHECK_SYS_UP(wl);
 	memcpy(&pmkid.pmkid[0].BSSID, pmksa->bssid, ETHER_ADDR_LEN);
@@ -3322,6 +3425,8 @@ wl_cfg80211_flush_pmksa(struct wiphy *wiphy, struct net_device *dev)
 {
 	struct wl_priv *wl = wiphy_priv(wiphy);
 	s32 err = 0;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	CHECK_SYS_UP(wl);
 	memset(wl->pmk_list, 0, sizeof(*wl->pmk_list));
 	err = wl_update_pmklist(dev, wl->pmk_list, err);
@@ -3335,6 +3440,8 @@ wl_cfg80211_scan_alloc_params(int channel, int nprobes, int *out_params_size)
 	wl_scan_params_t *params;
 	int params_size;
 	int num_chans;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	*out_params_size = 0;
 
@@ -3380,6 +3487,8 @@ wl_cfg80211_remain_on_channel(struct wiphy *wiphy, struct net_device *dev,
 
 	s32 err = BCME_OK;
 	struct wl_priv *wl = wiphy_priv(wiphy);
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("Enter, netdev_ifidx: %d \n", dev->ifindex));
 
 	if (wl->p2p_net == dev) {
@@ -3428,6 +3537,8 @@ wl_cfg80211_cancel_remain_on_channel(struct wiphy *wiphy, struct net_device *dev
 	u64 cookie)
 {
 	s32 err = 0;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG((" enter ) netdev_ifidx: %d \n", dev->ifindex));
 	return err;
 }
@@ -3437,6 +3548,8 @@ wl_cfg80211_send_pending_tx_act_frm(struct wl_priv *wl)
 {
 	wl_af_params_t *tx_act_frm;
 	struct net_device *dev = wl->afx_hdl->dev;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (!p2p_is_on(wl))
 		return -1;
 
@@ -3467,6 +3580,8 @@ wl_cfg80211_afx_handler(struct work_struct *work)
 
 	struct afx_hdl *afx_instance;
 	struct wl_priv *wl = wlcfg_drv_priv;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	afx_instance = container_of(work, struct afx_hdl, work);
 	if (afx_instance != NULL) {
 		wl_cfgp2p_act_frm_search(wl, wl->afx_hdl->dev,
@@ -3479,6 +3594,8 @@ wl_cfg80211_send_at_common_channel(struct wl_priv *wl,
 	struct net_device *dev,
 	wl_af_params_t *af_params)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG((" enter ) \n"));
 	/* initialize afx_hdl */
 	wl->afx_hdl->pending_tx_act_frm = af_params;
@@ -3552,6 +3669,8 @@ wl_cfg80211_mgmt_tx(struct wiphy *wiphy, struct net_device *ndev,
 	wifi_p2psd_gas_pub_act_frame_t *sd_act_frm = NULL;
 	s8 eabuf[ETHER_ADDR_STR_LEN];
 	int retry_cnt = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG(("Enter \n"));
 
@@ -3790,6 +3909,8 @@ wl_cfg80211_mgmt_frame_register(struct wiphy *wiphy, struct net_device *dev,
 	u16 frame_type, bool reg)
 {
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("%s: frame_type: %x, reg: %d\n", __func__, frame_type, reg));
 
 	if (frame_type != (IEEE80211_FTYPE_MGMT | IEEE80211_STYPE_PROBE_REQ))
@@ -3804,6 +3925,8 @@ wl_cfg80211_change_bss(struct wiphy *wiphy,
 	struct net_device *dev,
 	struct bss_parameters *params)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (params->use_cts_prot >= 0) {
 	}
 
@@ -3833,6 +3956,8 @@ wl_cfg80211_set_channel(struct wiphy *wiphy, struct net_device *dev,
 	s32 channel;
 	s32 err = BCME_OK;
 	struct wl_priv *wl = wiphy_priv(wiphy);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (wl->p2p_net == dev) {
 		dev = wl_to_prmry_ndev(wl);
@@ -3872,6 +3997,8 @@ wl_validate_wpa2ie(struct net_device *dev, bcm_tlv_t *wpa2ie, s32 bssidx)
 	wpa_suite_auth_key_mgmt_t *mgmt;
 	if (wpa2ie == NULL)
 		goto exit;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG(("Enter \n"));
 	len =  wpa2ie->len;
@@ -3978,6 +4105,8 @@ wl_validate_wpaie(struct net_device *dev, wpa_ie_fixed_t *wpaie, s32 bssidx)
 
 	if (wpaie == NULL)
 		goto exit;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("Enter \n"));
 	len = wpaie->length;    /* value length */
 	len -= WPA_IE_TAG_FIXED_LEN;
@@ -4131,6 +4260,8 @@ wl_cfg80211_add_set_beacon(struct wiphy *wiphy, struct net_device *dev,
 	s32 infra = 1;
 	s32 join_params_size = 0;
 	s32 ap = 0;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("interval (%d) dtim_period (%d) head_len (%d) tail_len (%d)\n",
 		info->interval, info->dtim_period, info->head_len, info->tail_len));
 
@@ -4486,6 +4617,8 @@ int wl_cfg80211_sched_scan_start(struct wiphy *wiphy,
 	int i;
 	int ret = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("Enter n_match_sets:%d   n_ssids:%d \n",
 		request->n_match_sets, request->n_ssids));
 	WL_DBG(("ssids:%d pno_time:%d pno_repeat:%d pno_freq:%d \n",
@@ -4551,6 +4684,8 @@ int wl_cfg80211_sched_scan_stop(struct wiphy *wiphy, struct net_device *dev)
 {
 	struct wl_priv *wl = wiphy_priv(wiphy);
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("Enter \n"));
 
 	if (dhd_dev_pno_enable(dev, 0) < 0)
@@ -4613,6 +4748,8 @@ s32 wl_mode_to_nl80211_iftype(s32 mode)
 {
 	s32 err = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	switch (mode) {
 	case WL_MODE_BSS:
 		return NL80211_IFTYPE_STATION;
@@ -4630,6 +4767,8 @@ s32 wl_mode_to_nl80211_iftype(s32 mode)
 static s32 wl_setup_wiphy(struct wireless_dev *wdev, struct device *sdiofunc_dev)
 {
 	s32 err = 0;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	wdev->wiphy =
 	    wiphy_new(&wl_cfg80211_ops, sizeof(struct wl_priv));
 	if (unlikely(!wdev->wiphy)) {
@@ -4691,6 +4830,8 @@ static void wl_free_wdev(struct wl_priv *wl)
 {
 	struct wireless_dev *wdev = wl->wdev;
 	struct wiphy *wiphy;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (!wdev) {
 		WL_ERR(("wdev is invalid\n"));
 		return;
@@ -4712,6 +4853,8 @@ static s32 wl_inform_bss(struct wl_priv *wl)
 	struct wl_bss_info *bi = NULL;	/* must be initialized */
 	s32 err = 0;
 	s32 i;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	bss_list = wl->bss_list;
 	WL_DBG(("scanned AP count (%d)\n", bss_list->count));
@@ -4738,6 +4881,8 @@ static s32 wl_inform_single_bss(struct wl_priv *wl, struct wl_bss_info *bi)
 	s32 signal;
 	u32 freq;
 	s32 err = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (unlikely(dtoh32(bi->length) > WL_BSS_INFO_MAX)) {
 		WL_DBG(("Beacon is larger than buffer. Discarding\n"));
@@ -4843,6 +4988,8 @@ static s32 wl_inform_ibss(struct wl_priv *wl, const u8 *bssid)
 	size_t notify_ielen;
 	s32 notify_signal;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("Enter\n"));
 
 	if (wl->scan_request) {
@@ -4939,6 +5086,8 @@ static bool wl_is_linkup(struct wl_priv *wl, const wl_event_msg_t *e, struct net
 	u32 status =  ntoh32(e->status);
 	u16 flags = ntoh16(e->flags);
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("event %d, status %d flags %x\n", event, status, flags));
 	if (event == WLC_E_SET_SSID) {
 		if (status == WLC_E_STATUS_SUCCESS) {
@@ -4959,6 +5108,8 @@ static bool wl_is_linkdown(struct wl_priv *wl, const wl_event_msg_t *e)
 	u32 event = ntoh32(e->event_type);
 	u16 flags = ntoh16(e->flags);
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (event == WLC_E_DEAUTH_IND ||
 	event == WLC_E_DISASSOC_IND ||
 	event == WLC_E_DISASSOC ||
@@ -4976,6 +5127,8 @@ static bool wl_is_nonetwork(struct wl_priv *wl, const wl_event_msg_t *e)
 {
 	u32 event = ntoh32(e->event_type);
 	u32 status = ntoh32(e->status);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (event == WLC_E_LINK && status == WLC_E_STATUS_NO_NETWORKS)
 		return true;
@@ -5020,6 +5173,8 @@ wl_notify_connect_status_ap(struct wl_priv *wl, struct net_device *ndev,
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 2, 0)) && !defined(WL_CFG80211_STA_EVENT)
 	memset(body, 0, sizeof(body));
 	memset(&bssid, 0, ETHER_ADDR_LEN);
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("Enter event %d ndev %p\n", event, ndev));
 	if (wl_get_mode_by_netdev(wl, ndev) == WL_INVALID)
 		return WL_INVALID;
@@ -5119,6 +5274,8 @@ wl_notify_connect_status(struct wl_priv *wl, struct net_device *ndev,
 	s32 err = 0;
 	u32 event = ntoh32(e->event_type);
 	u32 reason;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (wl_get_mode_by_netdev(wl, ndev) == WL_MODE_AP) {
 		wl_notify_connect_status_ap(wl, ndev, e, data);
@@ -5221,6 +5378,8 @@ wl_notify_roaming_status(struct wl_priv *wl, struct net_device *ndev,
 	s32 err = 0;
 	u32 event = be32_to_cpu(e->event_type);
 	u32 status = be32_to_cpu(e->status);
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("Enter \n"));
 	if (event == WLC_E_ROAM && status == WLC_E_STATUS_SUCCESS) {
 		if (wl_get_drv_status(wl, CONNECTED, ndev))
@@ -5239,6 +5398,8 @@ static s32 wl_get_assoc_ies(struct wl_priv *wl, struct net_device *ndev)
 	wl_assoc_info_t assoc_info;
 	struct wl_connect_info *conn_info = wl_to_conn(wl);
 	s32 err = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG(("Enter \n"));
 	err = wldev_iovar_getbuf(ndev, "assoc_info", NULL, 0, wl->extra_buf,
@@ -5309,6 +5470,8 @@ static void wl_ch_to_chanspec(int ch, struct wl_join_params *join_params,
 {
 	chanspec_t chanspec = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (ch != 0) {
 		join_params->params.chanspec_num = 1;
 		join_params->params.chanspec_list[0] = ch;
@@ -5351,6 +5514,8 @@ static s32 wl_update_bss_info(struct wl_priv *wl, struct net_device *ndev)
 	u8 *curbssid;
 	s32 err = 0;
 	struct wiphy *wiphy;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	wiphy = wl_to_wiphy(wl);
 
@@ -5426,6 +5591,8 @@ wl_bss_roaming_done(struct wl_priv *wl, struct net_device *ndev,
 	s32 err = 0;
 	u8 *curbssid;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	wl_get_assoc_ies(wl, ndev);
 	wl_update_prof(wl, ndev, NULL, (void *)(e->addr.octet), WL_PROF_BSSID);
 	curbssid = wl_read_prof(wl, ndev, WL_PROF_BSSID);
@@ -5452,6 +5619,8 @@ wl_bss_connect_done(struct wl_priv *wl, struct net_device *ndev,
 	struct wl_connect_info *conn_info = wl_to_conn(wl);
 	s32 err = 0;
 	u8 *curbssid = wl_read_prof(wl, ndev, WL_PROF_BSSID);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG((" enter\n"));
 
@@ -5499,6 +5668,8 @@ wl_ibss_join_done(struct wl_priv *wl, struct net_device *ndev,
 {
 	s32 err = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("Enter\n"));
 
 	if (wl->scan_request) {
@@ -5529,6 +5700,8 @@ wl_notify_mic_status(struct wl_priv *wl, struct net_device *ndev,
 	u16 flags = ntoh16(e->flags);
 	enum nl80211_key_type key_type;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	mutex_lock(&wl->usr_sync);
 	if (flags & WLC_EVENT_MSG_GROUP)
 		key_type = NL80211_KEYTYPE_GROUP;
@@ -5547,6 +5720,8 @@ static s32
 wl_notify_pfn_status(struct wl_priv *wl, struct net_device *ndev,
 	const wl_event_msg_t *e, void *data)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_ERR((" PNO Event\n"));
 
 	mutex_lock(&wl->usr_sync);
@@ -5573,6 +5748,8 @@ wl_notify_scan_status(struct wl_priv *wl, struct net_device *ndev,
 	u32 len = WL_SCAN_BUF_MAX;
 	s32 err = 0;
 	unsigned long flags;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG(("Enter \n"));
 	if (!wl_get_drv_status(wl, SCANNING, ndev)) {
@@ -5634,6 +5811,8 @@ wl_frame_get_mgmt(u16 fc, const struct ether_addr *da,
 	s32 err = 0;
 	u8 *offset;
 	u32 prebody_len = *body_len;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	switch (fc) {
 		case FC_ASSOC_REQ:
 			/* capability , listen interval */
@@ -5687,6 +5866,8 @@ wl_notify_rx_mgmt_frame(struct wl_priv *wl, struct net_device *ndev,
 	u8 bsscfgidx = e->bsscfgidx;
 	u32 mgmt_frame_len = ntoh32(e->datalen) - sizeof(wl_event_rx_frame_data_t);
 	u16 channel = ((ntoh16(rxframe->channel) & WL_CHANSPEC_CHAN_MASK));
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	memset(&bssid, 0, ETHER_ADDR_LEN);
 
@@ -5801,6 +5982,8 @@ wl_notify_sched_scan_results(struct wl_priv *wl, struct net_device *ndev,
 	int band = 0;
 	struct wl_pfn_scanresults *pfn_result = (struct wl_pfn_scanresults *)data;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("Enter\n"));
 
 	if (e->event_type == WLC_E_PFN_NET_LOST) {
@@ -5897,6 +6080,8 @@ out_err:
 
 static void wl_init_conf(struct wl_conf *conf)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("Enter \n"));
 	conf->frag_threshold = (u32)-1;
 	conf->rts_threshold = (u32)-1;
@@ -5910,6 +6095,8 @@ static void wl_init_prof(struct wl_priv *wl, struct net_device *ndev)
 	unsigned long flags;
 	struct wl_profile *profile = wl_get_profile_by_netdev(wl, ndev);
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	spin_lock_irqsave(&wl->cfgdrv_lock, flags);
 	memset(profile, 0, sizeof(struct wl_profile));
 	spin_unlock_irqrestore(&wl->cfgdrv_lock, flags);
@@ -5917,6 +6104,8 @@ static void wl_init_prof(struct wl_priv *wl, struct net_device *ndev)
 
 static void wl_init_event_handler(struct wl_priv *wl)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	memset(wl->evt_handler, 0, sizeof(wl->evt_handler));
 
 	wl->evt_handler[WLC_E_SCAN_COMPLETE] = wl_notify_scan_status;
@@ -5942,6 +6131,8 @@ static void wl_init_event_handler(struct wl_priv *wl)
 
 static s32 wl_init_priv_mem(struct wl_priv *wl)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("Enter \n"));
 	wl->scan_results = (void *)kzalloc(WL_SCAN_BUF_MAX, GFP_KERNEL);
 	if (unlikely(!wl->scan_results)) {
@@ -6007,6 +6198,8 @@ init_priv_mem_out:
 
 static void wl_deinit_priv_mem(struct wl_priv *wl)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	kfree(wl->scan_results);
 	wl->scan_results = NULL;
 	kfree(wl->conf);
@@ -6043,6 +6236,8 @@ static void wl_deinit_priv_mem(struct wl_priv *wl)
 static s32 wl_create_event_handler(struct wl_priv *wl)
 {
 	int ret = 0;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("Enter \n"));
 
 	/* Do not use DHD in cfg driver */
@@ -6055,6 +6250,8 @@ static s32 wl_create_event_handler(struct wl_priv *wl)
 
 static void wl_destroy_event_handler(struct wl_priv *wl)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (wl->event_tsk.thr_pid >= 0)
 		PROC_STOP(&wl->event_tsk);
 }
@@ -6062,6 +6259,8 @@ static void wl_destroy_event_handler(struct wl_priv *wl)
 static void wl_term_iscan(struct wl_priv *wl)
 {
 	struct wl_iscan_ctrl *iscan = wl_to_iscan(wl);
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("In\n"));
 	if (wl->iscan_on && iscan->tsk) {
 		iscan->state = WL_ISCAN_STATE_IDLE;
@@ -6078,6 +6277,8 @@ static void wl_notify_iscan_complete(struct wl_iscan_ctrl *iscan, bool aborted)
 	struct wl_priv *wl = iscan_to_wl(iscan);
 	struct net_device *ndev = wl_to_prmry_ndev(wl);
 	unsigned long flags;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG(("Enter \n"));
 	if(!aborted)
@@ -6100,6 +6301,8 @@ static void wl_notify_iscan_complete(struct wl_iscan_ctrl *iscan, bool aborted)
 
 static s32 wl_wakeup_iscan(struct wl_iscan_ctrl *iscan)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (likely(iscan->state != WL_ISCAN_STATE_IDLE)) {
 		WL_DBG(("wake up iscan\n"));
 		up(&iscan->sync);
@@ -6117,6 +6320,8 @@ wl_get_iscan_results(struct wl_iscan_ctrl *iscan, u32 *status,
 	struct wl_scan_results *results;
 	struct wl_iscan_results *list_buf;
 	s32 err = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG(("Enter \n"));
 	memset(iscan->scan_buf, 0, WL_ISCAN_BUF_MAX);
@@ -6151,6 +6356,8 @@ static s32 wl_iscan_done(struct wl_priv *wl)
 	struct wl_iscan_ctrl *iscan = wl->iscan;
 	s32 err = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	iscan->state = WL_ISCAN_STATE_IDLE;
 	mutex_lock(&wl->usr_sync);
 	wl_inform_bss(wl);
@@ -6165,6 +6372,8 @@ static s32 wl_iscan_pending(struct wl_priv *wl)
 	struct wl_iscan_ctrl *iscan = wl->iscan;
 	s32 err = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	/* Reschedule the timer */
 	mod_timer(&iscan->timer, jiffies + msecs_to_jiffies(iscan->timer_ms));
 	iscan->timer_on = 1;
@@ -6176,6 +6385,8 @@ static s32 wl_iscan_inprogress(struct wl_priv *wl)
 {
 	struct wl_iscan_ctrl *iscan = wl->iscan;
 	s32 err = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	mutex_lock(&wl->usr_sync);
 	wl_inform_bss(wl);
@@ -6193,6 +6404,8 @@ static s32 wl_iscan_aborted(struct wl_priv *wl)
 	struct wl_iscan_ctrl *iscan = wl->iscan;
 	s32 err = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	iscan->state = WL_ISCAN_STATE_IDLE;
 	mutex_lock(&wl->usr_sync);
 	wl_notify_iscan_complete(iscan, true);
@@ -6207,6 +6420,8 @@ static s32 wl_iscan_thread(void *data)
 	struct wl_priv *wl = iscan_to_wl(iscan);
 	u32 status;
 	int err = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	allow_signal(SIGTERM);
 	status = WL_SCAN_RESULTS_PARTIAL;
@@ -6239,12 +6454,16 @@ static void wl_scan_timeout(unsigned long data)
 {
 	struct wl_priv *wl = (struct wl_priv *)data;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	schedule_work(&wl->work_scan_timeout);
 }
 
 static void wl_scan_timeout_process(struct work_struct *work)
 {
 	struct wl_priv *wl;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	wl = (wl_priv_t *)container_of(work, wl_priv_t, work_scan_timeout);
 
@@ -6269,6 +6488,8 @@ static void wl_iscan_timer(unsigned long data)
 {
 	struct wl_iscan_ctrl *iscan = (struct wl_iscan_ctrl *)data;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (iscan) {
 		iscan->timer_on = 0;
 		WL_DBG(("timer expired\n"));
@@ -6280,6 +6501,8 @@ static s32 wl_invoke_iscan(struct wl_priv *wl)
 {
 	struct wl_iscan_ctrl *iscan = wl_to_iscan(wl);
 	int err = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (wl->iscan_on && !iscan->tsk) {
 		iscan->state = WL_ISCAN_STATE_IDLE;
@@ -6297,6 +6520,8 @@ static s32 wl_invoke_iscan(struct wl_priv *wl)
 
 static void wl_init_iscan_handler(struct wl_iscan_ctrl *iscan)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	memset(iscan->iscan_handler, 0, sizeof(iscan->iscan_handler));
 	iscan->iscan_handler[WL_SCAN_RESULTS_SUCCESS] = wl_iscan_done;
 	iscan->iscan_handler[WL_SCAN_RESULTS_PARTIAL] = wl_iscan_inprogress;
@@ -6313,6 +6538,8 @@ wl_cfg80211_netdev_notifier_call(struct notifier_block * nb,
 	struct net_device *dev = ndev;
 	struct wireless_dev *wdev = dev->ieee80211_ptr;
 	struct wl_priv *wl = wlcfg_drv_priv;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG(("Enter \n"));
 	if (!wdev || !wl || dev == wl_to_prmry_ndev(wl))
@@ -6351,6 +6578,8 @@ static s32 wl_notify_escan_complete(struct wl_priv *wl,
 	s32 err = BCME_OK;
 	unsigned long flags;
 	struct net_device *dev;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG(("Enter \n"));
 
@@ -6427,6 +6656,8 @@ static s32 wl_escan_handler(struct wl_priv *wl,
 	u32 i;
 	wifi_p2p_ie_t * p2p_ie;
 	u8 *p2p_dev_addr = NULL;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG((" enter event type : %d, status : %d \n",
 		ntoh32(e->event_type), ntoh32(e->status)));
@@ -6602,6 +6833,8 @@ static s32 wl_init_scan(struct wl_priv *wl)
 	struct wl_iscan_ctrl *iscan = wl_to_iscan(wl);
 	int err = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (wl->iscan_on) {
 		iscan->dev = wl_to_prmry_ndev(wl);
 		iscan->state = WL_ISCAN_STATE_IDLE;
@@ -6635,6 +6868,8 @@ static s32 wl_init_priv(struct wl_priv *wl)
 	struct wiphy *wiphy = wl_to_wiphy(wl);
 	struct net_device *ndev = wl_to_prmry_ndev(wl);
 	s32 err = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	wl->scan_request = NULL;
 	wl->pwr_save = !!(wiphy->flags & WIPHY_FLAG_PS_ON_BY_DEFAULT);
@@ -6670,6 +6905,8 @@ static s32 wl_init_priv(struct wl_priv *wl)
 
 static void wl_deinit_priv(struct wl_priv *wl)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DNGL_FUNC(dhd_cfg80211_deinit, (wl));
 	wl_destroy_event_handler(wl);
 	wl_flush_eq(wl);
@@ -6686,6 +6923,8 @@ static s32 wl_cfg80211_attach_p2p(void)
 {
 	struct wl_priv *wl = wlcfg_drv_priv;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("Enter \n"));
 
 	if (wl_cfgp2p_register_ndev(wl) < 0) {
@@ -6700,6 +6939,8 @@ static s32  wl_cfg80211_detach_p2p(void)
 {
 	struct wl_priv *wl = wlcfg_drv_priv;
 	struct wireless_dev *wdev = wl->p2p_wdev;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG(("Enter \n"));
 	if (!wdev || !wl) {
@@ -6722,6 +6963,8 @@ s32 wl_cfg80211_attach_post(struct net_device *ndev)
 {
 	struct wl_priv * wl = NULL;
 	s32 err = 0;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("In\n"));
 	if (unlikely(!ndev)) {
 		WL_ERR(("ndev is invaild\n"));
@@ -6768,6 +7011,8 @@ s32 wl_cfg80211_attach(struct net_device *ndev, void *data)
 	struct wl_priv *wl;
 	s32 err = 0;
 	struct device *dev;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("In\n"));
 	if (!ndev) {
@@ -6843,6 +7088,8 @@ void wl_cfg80211_detach(void *para)
 
 	wl = wlcfg_drv_priv;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("In\n"));
 
 #if defined(COEX_DHCP)
@@ -6866,6 +7113,8 @@ void wl_cfg80211_detach(void *para)
 
 static void wl_wakeup_event(struct wl_priv *wl)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (wl->event_tsk.thr_pid >= 0) {
 		DHD_OS_WAKE_LOCK(wl->pub);
 		up(&wl->event_tsk.sema);
@@ -6874,6 +7123,8 @@ static void wl_wakeup_event(struct wl_priv *wl)
 
 static int wl_is_p2p_event(struct wl_event_q *e)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	switch (e->etype) {
 	/* We have to seperate out the P2P events received
 	 * on primary interface so that it can be send up
@@ -6914,6 +7165,8 @@ static s32 wl_event_handler(void *data)
 	struct wl_priv *wl = NULL;
 	struct wl_event_q *e;
 	tsk_ctl_t *tsk = (tsk_ctl_t *)data;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	wl = (struct wl_priv *)tsk->parent;
 	DAEMONIZE("dhd_cfg80211_event");
@@ -6956,6 +7209,8 @@ wl_cfg80211_event(struct net_device *ndev, const wl_event_msg_t * e, void *data)
 	u32 event_type = ntoh32(e->event_type);
 	struct wl_priv *wl = wlcfg_drv_priv;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 #if (WL_DBG_LEVEL > 0)
 	s8 *estr = (event_type <= sizeof(wl_dbg_estr) / WL_DBG_ESTR_MAX - 1) ?
 	    wl_dbg_estr[event_type] : (s8 *) "Unknown";
@@ -6968,6 +7223,8 @@ wl_cfg80211_event(struct net_device *ndev, const wl_event_msg_t * e, void *data)
 
 static void wl_init_eq(struct wl_priv *wl)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	wl_init_eq_lock(wl);
 	INIT_LIST_HEAD(&wl->eq_list);
 }
@@ -6976,6 +7233,8 @@ static void wl_flush_eq(struct wl_priv *wl)
 {
 	struct wl_event_q *e;
 	unsigned long flags;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	flags = wl_lock_eq(wl);
 	while (!list_empty(&wl->eq_list)) {
@@ -6994,6 +7253,8 @@ static struct wl_event_q *wl_deq_event(struct wl_priv *wl)
 {
 	struct wl_event_q *e = NULL;
 	unsigned long flags;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	flags = wl_lock_eq(wl);
 	if (likely(!list_empty(&wl->eq_list))) {
@@ -7020,6 +7281,8 @@ wl_enq_event(struct wl_priv *wl, struct net_device *ndev, u32 event, const wl_ev
 	unsigned long flags;
 	gfp_t aflags;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	data_len = 0;
 	if (data)
 		data_len = ntoh32(msg->datalen);
@@ -7043,6 +7306,8 @@ wl_enq_event(struct wl_priv *wl, struct net_device *ndev, u32 event, const wl_ev
 
 static void wl_put_event(struct wl_event_q *e)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	kfree(e);
 }
 
@@ -7051,6 +7316,8 @@ static s32 wl_config_ifmode(struct wl_priv *wl, struct net_device *ndev, s32 ift
 	s32 infra = 0;
 	s32 err = 0;
 	s32 mode = 0;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	switch (iftype) {
 	case NL80211_IFTYPE_MONITOR:
 	case NL80211_IFTYPE_WDS:
@@ -7095,6 +7362,8 @@ s32 wl_add_remove_eventmsg(struct net_device *ndev, u16 event, bool add)
 	s8 eventmask[WL_EVENTING_MASK_LEN];
 	s32 err = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	/* Setup event_msgs */
 	bcm_mkiovar("event_msgs", NULL, 0, iovbuf,
 		sizeof(iovbuf));
@@ -7134,6 +7403,8 @@ static int wl_construct_reginfo(struct wl_priv *wl, s32 bw_cap)
 	bool update;
 	bool ht40_allowed;
 	u8 *pbuf = NULL;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 #define LOCAL_BUF_LEN 1024
 	pbuf = kzalloc(LOCAL_BUF_LEN, GFP_KERNEL);
@@ -7261,6 +7532,8 @@ s32 wl_update_wiphybands(struct wl_priv *wl)
 	int index = 0;
 	bool rollback_lock = false;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("Entry"));
 
 	if (wl == NULL) {
@@ -7340,6 +7613,8 @@ static s32 __wl_cfg80211_up(struct wl_priv *wl)
 	struct net_device *ndev = wl_to_prmry_ndev(wl);
 	struct wireless_dev *wdev = ndev->ieee80211_ptr;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("In\n"));
 
 	err = dhd_config_dongle(wl, false);
@@ -7371,6 +7646,8 @@ static s32 __wl_cfg80211_down(struct wl_priv *wl)
 	struct wiphy *wiphy = wl_to_prmry_ndev(wl)->ieee80211_ptr->wiphy;
 	struct net_device *p2p_net = wl->p2p_net;
 #endif
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG(("In\n"));
 	/* Check if cfg80211 interface is already down */
@@ -7423,6 +7700,8 @@ s32 wl_cfg80211_up(void *para)
 	struct wl_priv *wl;
 	s32 err = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("In\n"));
 	wl = wlcfg_drv_priv;
 	mutex_lock(&wl->usr_sync);
@@ -7440,6 +7719,8 @@ int wl_cfg80211_hang(struct net_device *dev, u16 reason)
 	struct wl_priv *wl;
 	wl = wlcfg_drv_priv;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_ERR(("In : chip crash eventing\n"));
 	cfg80211_disconnected(dev, reason, NULL, 0, GFP_KERNEL);
 	if (wl != NULL) {
@@ -7452,6 +7733,8 @@ s32 wl_cfg80211_down(void *para)
 {
 	struct wl_priv *wl;
 	s32 err = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG(("In\n"));
 	wl = wlcfg_drv_priv;
@@ -7467,6 +7750,8 @@ static void *wl_read_prof(struct wl_priv *wl, struct net_device *ndev, s32 item)
 	unsigned long flags;
 	void *rptr = NULL;
 	struct wl_profile *profile = wl_get_profile_by_netdev(wl, ndev);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!profile)
 		return NULL;
@@ -7502,6 +7787,8 @@ wl_update_prof(struct wl_priv *wl, struct net_device *ndev,
 	struct wlc_ssid *ssid;
 	unsigned long flags;
 	struct wl_profile *profile = wl_get_profile_by_netdev(wl, ndev);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!profile)
 		return WL_INVALID;
@@ -7556,20 +7843,28 @@ void wl_cfg80211_dbg_level(u32 level)
 	* in compile time by using CONFIG_XXX
 	*/
 	/* wl_dbg_level = level; */
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 }
 
 static bool wl_is_ibssmode(struct wl_priv *wl, struct net_device *ndev)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return wl_get_mode_by_netdev(wl, ndev) == WL_MODE_IBSS;
 }
 
 static __used bool wl_is_ibssstarter(struct wl_priv *wl)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return wl->ibss_starter;
 }
 
 static void wl_rst_ie(struct wl_priv *wl)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	struct wl_ie *ie = wl_to_ie(wl);
 
 	ie->offset = 0;
@@ -7579,6 +7874,8 @@ static __used s32 wl_add_ie(struct wl_priv *wl, u8 t, u8 l, u8 *v)
 {
 	struct wl_ie *ie = wl_to_ie(wl);
 	s32 err = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (unlikely(ie->offset + l + 2 > WL_TLV_INFO_MAX)) {
 		WL_ERR(("ei crosses buffer boundary\n"));
@@ -7597,6 +7894,8 @@ static s32 wl_mrg_ie(struct wl_priv *wl, u8 *ie_stream, u16 ie_size)
 	struct wl_ie *ie = wl_to_ie(wl);
 	s32 err = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (unlikely(ie->offset + ie_size > WL_TLV_INFO_MAX)) {
 		WL_ERR(("ei_stream crosses buffer boundary\n"));
 		return -ENOSPC;
@@ -7612,6 +7911,8 @@ static s32 wl_cp_ie(struct wl_priv *wl, u8 *dst, u16 dst_size)
 	struct wl_ie *ie = wl_to_ie(wl);
 	s32 err = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (unlikely(ie->offset > dst_size)) {
 		WL_ERR(("dst_size is not enough\n"));
 		return -ENOSPC;
@@ -7625,17 +7926,23 @@ static u32 wl_get_ielen(struct wl_priv *wl)
 {
 	struct wl_ie *ie = wl_to_ie(wl);
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return ie->offset;
 }
 
 static void wl_link_up(struct wl_priv *wl)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	wl->link_up = true;
 }
 
 static void wl_link_down(struct wl_priv *wl)
 {
 	struct wl_connect_info *conn_info = wl_to_conn(wl);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG(("In\n"));
 	wl->link_up = false;
@@ -7647,22 +7954,30 @@ static unsigned long wl_lock_eq(struct wl_priv *wl)
 {
 	unsigned long flags;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	spin_lock_irqsave(&wl->eq_lock, flags);
 	return flags;
 }
 
 static void wl_unlock_eq(struct wl_priv *wl, unsigned long flags)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	spin_unlock_irqrestore(&wl->eq_lock, flags);
 }
 
 static void wl_init_eq_lock(struct wl_priv *wl)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	spin_lock_init(&wl->eq_lock);
 }
 
 static void wl_delay(u32 ms)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (in_atomic() || (ms < jiffies_to_msecs(1))) {
 		mdelay(ms);
 	} else {
@@ -7675,6 +7990,8 @@ s32 wl_cfg80211_get_p2p_dev_addr(struct net_device *net, struct ether_addr *p2pd
 	struct wl_priv *wl = wlcfg_drv_priv;
 	struct ether_addr p2pif_addr;
 	struct ether_addr primary_mac;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!wl->p2p)
 		return -1;
@@ -7692,6 +8009,8 @@ s32 wl_cfg80211_set_p2p_noa(struct net_device *net, char* buf, int len)
 {
 	struct wl_priv *wl;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	wl = wlcfg_drv_priv;
 
 	return wl_cfgp2p_set_p2p_noa(wl, net, buf, len);
@@ -7700,6 +8019,8 @@ s32 wl_cfg80211_set_p2p_noa(struct net_device *net, char* buf, int len)
 s32 wl_cfg80211_get_p2p_noa(struct net_device *net, char* buf, int len)
 {
 	struct wl_priv *wl;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	wl = wlcfg_drv_priv;
 
 	return wl_cfgp2p_get_p2p_noa(wl, net, buf, len);
@@ -7708,6 +8029,8 @@ s32 wl_cfg80211_get_p2p_noa(struct net_device *net, char* buf, int len)
 s32 wl_cfg80211_set_p2p_ps(struct net_device *net, char* buf, int len)
 {
 	struct wl_priv *wl;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	wl = wlcfg_drv_priv;
 
 	return wl_cfgp2p_set_p2p_ps(wl, net, buf, len);
@@ -7723,6 +8046,8 @@ s32 wl_cfg80211_set_wps_p2p_ie(struct net_device *net, char *buf, int len,
 	s32 bssidx = 0;
 	s32 pktflag = 0;
 	wl = wlcfg_drv_priv;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (wl_get_drv_status(wl, AP_CREATING, net) ||
 		wl_get_drv_status(wl, AP_CREATED, net)) {
@@ -7784,6 +8109,8 @@ static int wl_rfkill_set(void *data, bool blocked)
 {
 	struct wl_priv *wl = (struct wl_priv *)data;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_DBG(("Enter \n"));
 	WL_DBG(("RF %s\n", blocked ? "blocked" : "unblocked"));
 
@@ -7798,6 +8125,8 @@ static int wl_rfkill_set(void *data, bool blocked)
 static int wl_setup_rfkill(struct wl_priv *wl, bool setup)
 {
 	s32 err = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_DBG(("Enter \n"));
 	if (!wl)
@@ -7832,21 +8161,29 @@ err_out:
 
 struct device *wl_cfg80211_get_parent_dev(void)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return cfg80211_parent_dev;
 }
 
 void wl_cfg80211_set_parent_dev(void *dev)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	cfg80211_parent_dev = dev;
 }
 
 static void wl_cfg80211_clear_parent_dev(void)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	cfg80211_parent_dev = NULL;
 }
 
 static void get_primary_mac(struct wl_priv *wl, struct ether_addr *mac)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	wldev_iovar_getbuf_bsscfg(wl_to_prmry_ndev(wl), "cur_etheraddr", NULL,
 		0, wl->ioctl_buf, WLC_IOCTL_MAXLEN, 0, &wl->ioctl_buf_sync);
 	memcpy(mac->octet, wl->ioctl_buf, ETHER_ADDR_LEN);
@@ -7855,6 +8192,8 @@ static void get_primary_mac(struct wl_priv *wl, struct ether_addr *mac)
 int wl_cfg80211_do_driver_init(struct net_device *net)
 {
 	struct wl_priv *wl = *(struct wl_priv **)netdev_priv(net);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!wl || !wl->wdev)
 		return -EINVAL;
@@ -7867,6 +8206,8 @@ int wl_cfg80211_do_driver_init(struct net_device *net)
 
 void wl_cfg80211_enable_trace(int level)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	wl_dbg_level |= WL_DBG_DBG;
 }
 
@@ -7874,5 +8215,7 @@ static s32
 wl_cfg80211_mgmt_tx_cancel_wait(struct wiphy *wiphy,
 	struct net_device *dev, u64 cookie)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return 0;
 }

@@ -480,6 +480,8 @@ static int dhd_wl_host_event(dhd_info_t *dhd, int *ifidx, void *pktdata,
 static int dhd_sleep_pm_callback(struct notifier_block *nfb, unsigned long action, void *ignored)
 {
 	int ret = NOTIFY_DONE;
+	
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 39))
 	switch (action) {
@@ -510,6 +512,8 @@ extern int unregister_pm_notifier(struct notifier_block *nb);
 static void dhd_set_packet_filter(int value, dhd_pub_t *dhd)
 {
 #ifdef PKT_FILTER_SUPPORT
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: %d\n", __FUNCTION__, value));
 	/* 1 - Enable packet filter, only allow unicast packet to send up */
 	/* 0 - Disable packet filter */
@@ -533,6 +537,8 @@ static int dhd_set_suspend(int value, dhd_pub_t *dhd)
 	char iovbuf[32];
 	int bcn_li_dtim = 3;
 	uint roamvar = 1;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: enter, value = %d in_suspend=%d\n",
 		__FUNCTION__, value, dhd->in_suspend));
@@ -595,6 +601,8 @@ static int dhd_suspend_resume_helper(struct dhd_info *dhd, int val, int force)
 	dhd_pub_t *dhdp = &dhd->pub;
 	int ret = 0;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_OS_WAKE_LOCK(dhdp);
 	/* Set flag when early suspend was called */
 	dhdp->in_suspend = val;
@@ -611,6 +619,8 @@ static void dhd_early_suspend(struct early_suspend *h)
 {
 	struct dhd_info *dhd = container_of(h, struct dhd_info, early_suspend);
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: enter\n", __FUNCTION__));
 
 	if (dhd)
@@ -620,6 +630,8 @@ static void dhd_early_suspend(struct early_suspend *h)
 static void dhd_late_resume(struct early_suspend *h)
 {
 	struct dhd_info *dhd = container_of(h, struct dhd_info, early_suspend);
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: enter\n", __FUNCTION__));
 
@@ -643,6 +655,8 @@ static void dhd_late_resume(struct early_suspend *h)
 void
 dhd_timeout_start(dhd_timeout_t *tmo, uint usec)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	tmo->limit = usec;
 	tmo->increment = 0;
 	tmo->elapsed = 0;
@@ -652,6 +666,8 @@ dhd_timeout_start(dhd_timeout_t *tmo, uint usec)
 int
 dhd_timeout_expired(dhd_timeout_t *tmo)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	/* Does nothing the first call */
 	if (tmo->increment == 0) {
 		tmo->increment = 1;
@@ -689,6 +705,8 @@ dhd_net2idx(dhd_info_t *dhd, struct net_device *net)
 	int i = 0;
 
 	ASSERT(dhd);
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	while (i < DHD_MAX_IFS) {
 		if (dhd->iflist[i] && (dhd->iflist[i]->net == net))
 			return i;
@@ -702,6 +720,8 @@ struct net_device * dhd_idx2net(void *pub, int ifidx)
 {
 	struct dhd_pub *dhd_pub = (struct dhd_pub *)pub;
 	struct dhd_info *dhd_info;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (!dhd_pub || ifidx < 0 || ifidx >= DHD_MAX_IFS)
 		return NULL;
@@ -717,6 +737,8 @@ dhd_ifname2idx(dhd_info_t *dhd, char *name)
 	int i = DHD_MAX_IFS;
 
 	ASSERT(dhd);
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (name == NULL || *name == '\0')
 		return 0;
@@ -736,6 +758,8 @@ dhd_ifname(dhd_pub_t *dhdp, int ifidx)
 	dhd_info_t *dhd = (dhd_info_t *)dhdp->info;
 
 	ASSERT(dhd);
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (ifidx < 0 || ifidx >= DHD_MAX_IFS) {
 		DHD_ERROR(("%s: ifidx %d out of range\n", __FUNCTION__, ifidx));
@@ -760,6 +784,8 @@ dhd_bssidx2bssid(dhd_pub_t *dhdp, int idx)
 	dhd_info_t *dhd = (dhd_info_t *)dhdp;
 
 	ASSERT(dhd);
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	for (i = 0; i < DHD_MAX_IFS; i++)
 	if (dhd->iflist[i] && dhd->iflist[i]->bssidx == idx)
 		return dhd->iflist[i]->mac_addr;
@@ -785,6 +811,8 @@ _dhd_set_multicast_list(dhd_info_t *dhd, int ifidx)
 	int ret;
 
 	ASSERT(dhd && dhd->iflist[ifidx]);
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	dev = dhd->iflist[ifidx]->net;
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 27)
 	netif_addr_lock_bh(dev);
@@ -913,6 +941,8 @@ _dhd_set_mac_address(dhd_info_t *dhd, int ifidx, struct ether_addr *addr)
 	wl_ioctl_t ioc;
 	int ret;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (!bcm_mkiovar("cur_etheraddr", (char*)addr, ETHER_ADDR_LEN, buf, 32)) {
 		DHD_ERROR(("%s: mkiovar failed for cur_etheraddr\n", dhd_ifname(&dhd->pub, ifidx)));
 		return -1;
@@ -952,6 +982,8 @@ dhd_op_if(dhd_if_t *ifp)
 		return;
 	ASSERT(ifp && ifp->info && ifp->idx);	/* Virtual interfaces only */
 	dhd = ifp->info;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: idx %d, state %d\n", __FUNCTION__, ifp->idx, ifp->state));
 
@@ -1073,6 +1105,8 @@ _dhd_sysioc_thread(void *data)
 	unsigned long flags;
 #endif
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DAEMONIZE("dhd_sysioc");
 
 	complete(&tsk->completed);
@@ -1145,6 +1179,8 @@ dhd_set_mac_address(struct net_device *dev, void *addr)
 	struct sockaddr *sa = (struct sockaddr *)addr;
 	int ifidx;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	ifidx = dhd_net2idx(dhd, dev);
 	if (ifidx == DHD_BAD_IF)
 		return -1;
@@ -1163,6 +1199,8 @@ dhd_set_multicast_list(struct net_device *dev)
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
 	int ifidx;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	ifidx = dhd_net2idx(dhd, dev);
 	if (ifidx == DHD_BAD_IF)
 		return;
@@ -1179,6 +1217,8 @@ dhd_os_wlfc_block(dhd_pub_t *pub)
 	dhd_info_t *di = (dhd_info_t *)(pub->info);
 	ASSERT(di != NULL);
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	spin_lock_bh(&di->wlfc_spinlock);
 	return 1;
 }
@@ -1188,6 +1228,8 @@ dhd_os_wlfc_unblock(dhd_pub_t *pub)
 {
 	dhd_info_t *di = (dhd_info_t *)(pub->info);
 	ASSERT(di != NULL);
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	spin_unlock_bh(&di->wlfc_spinlock);
 	return 1;
 }
@@ -1203,6 +1245,8 @@ dhd_sendpkt(dhd_pub_t *dhdp, int ifidx, void *pktbuf)
 	int ret;
 	dhd_info_t *dhd = (dhd_info_t *)(dhdp->info);
 	struct ether_header *eh = NULL;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	/* Reject if down */
 	if (!dhdp->up || (dhdp->busstate == DHD_BUS_DOWN)) {
@@ -1288,6 +1332,8 @@ dhd_start_xmit(struct sk_buff *skb, struct net_device *net)
 #else
 	uint8 htsfdlystat_sz = 0;
 #endif
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -1380,6 +1426,8 @@ dhd_txflowcontrol(dhd_pub_t *dhdp, int ifidx, bool state)
 	dhd_info_t *dhd = dhdp->info;
 	int i;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	dhdp->txoff = state;
@@ -1421,6 +1469,8 @@ dhd_rx_frame(dhd_pub_t *dhdp, int ifidx, void *pktbuf, int numpkt, uint8 chan)
 	wl_event_msg_t event;
 	int tout_rx = 0;
 	int tout_ctrl = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -1575,6 +1625,8 @@ dhd_rx_frame(dhd_pub_t *dhdp, int ifidx, void *pktbuf, int numpkt, uint8 chan)
 void
 dhd_event(struct dhd_info *dhd, char *evpkt, int evlen, int ifidx)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	/* Linux version has nothing to do */
 	return;
 }
@@ -1587,6 +1639,8 @@ dhd_txcomplete(dhd_pub_t *dhdp, void *txp, bool success)
 	struct ether_header *eh;
 	uint16 type;
 	uint len;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	dhd_prot_hdrpull(dhdp, &ifidx, txp);
 
@@ -1619,6 +1673,8 @@ dhd_get_stats(struct net_device *net)
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(net);
 	dhd_if_t *ifp;
 	int ifidx;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -1656,6 +1712,8 @@ dhd_watchdog_thread(void *data)
 {
 	tsk_ctl_t *tsk = (tsk_ctl_t *)data;
 	dhd_info_t *dhd = (dhd_info_t *)tsk->parent;
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	/* This thread doesn't need any user-level access,
 	 * so get rid of all our resources
 	 */
@@ -1711,6 +1769,8 @@ static void dhd_watchdog(ulong data)
 	dhd_info_t *dhd = (dhd_info_t *)data;
 	unsigned long flags;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_OS_WAKE_LOCK(&dhd->pub);
 	if (dhd->pub.dongle_reset) {
 		DHD_OS_WAKE_UNLOCK(&dhd->pub);
@@ -1746,6 +1806,8 @@ dhd_dpc_thread(void *data)
 {
 	tsk_ctl_t *tsk = (tsk_ctl_t *)data;
 	dhd_info_t *dhd = (dhd_info_t *)tsk->parent;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	/* This thread doesn't need any user-level access,
 	 * so get rid of all our resources
@@ -1799,6 +1861,8 @@ dhd_dpc(ulong data)
 {
 	dhd_info_t *dhd;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	dhd = (dhd_info_t *)data;
 
 	/* this (tasklet) can be scheduled in dhd_sched_dpc[dhd_linux.c]
@@ -1822,6 +1886,8 @@ dhd_sched_dpc(dhd_pub_t *dhdp)
 {
 	dhd_info_t *dhd = (dhd_info_t *)dhdp->info;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_OS_WAKE_LOCK(dhdp);
 #ifdef DHDTHREAD
 	if (dhd->thr_dpc_ctl.thr_pid >= 0) {
@@ -1841,6 +1907,8 @@ dhd_toe_get(dhd_info_t *dhd, int ifidx, uint32 *toe_ol)
 	wl_ioctl_t ioc;
 	char buf[32];
 	int ret;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	memset(&ioc, 0, sizeof(ioc));
 
@@ -1873,6 +1941,8 @@ dhd_toe_set(dhd_info_t *dhd, int ifidx, uint32 toe_ol)
 	wl_ioctl_t ioc;
 	char buf[32];
 	int toe, ret;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	memset(&ioc, 0, sizeof(ioc));
 
@@ -1914,6 +1984,8 @@ dhd_ethtool_get_drvinfo(struct net_device *net, struct ethtool_drvinfo *info)
 {
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(net);
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	sprintf(info->driver, "wl");
 	sprintf(info->version, "%lu", dhd->pub.drv_version);
 }
@@ -1936,6 +2008,8 @@ dhd_ethtool(dhd_info_t *dhd, void *uaddr)
 	uint32 toe_cmpnt, csum_dir;
 	int ret;
 #endif
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -2037,6 +2111,8 @@ dhd_ethtool(dhd_info_t *dhd, void *uaddr)
 
 static bool dhd_check_hang(struct net_device *net, dhd_pub_t *dhdp, int error)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 27))
 	if (!dhdp)
 		return FALSE;
@@ -2062,6 +2138,8 @@ dhd_ioctl_entry(struct net_device *net, struct ifreq *ifr, int cmd)
 	uint driver = 0;
 	int ifidx;
 	int ret;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_OS_WAKE_LOCK(&dhd->pub);
 
@@ -2264,6 +2342,8 @@ dhd_cleanup_virt_ifaces(dhd_info_t *dhd)
 	int rollback_lock = FALSE;
 #endif
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter \n", __func__));
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 27))
@@ -2302,6 +2382,8 @@ dhd_stop(struct net_device *net)
 {
 	int ifidx = 0;
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(net);
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_OS_WAKE_LOCK(&dhd->pub);
 	DHD_TRACE(("%s: Enter %p\n", __FUNCTION__, net));
 	if (dhd->pub.up == 0) {
@@ -2357,6 +2439,8 @@ dhd_open(struct net_device *net)
 #endif
 	int ifidx;
 	int32 ret = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_OS_WAKE_LOCK(&dhd->pub);
 	/* Update FW path if it was changed */
@@ -2463,6 +2547,8 @@ int dhd_do_driver_init(struct net_device *net)
 {
 	dhd_info_t *dhd = NULL;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (!net) {
 		DHD_ERROR(("Primary Interface not initialized \n"));
 		return -EINVAL;
@@ -2488,12 +2574,16 @@ int dhd_do_driver_init(struct net_device *net)
 osl_t *
 dhd_osl_attach(void *pdev, uint bustype)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	return osl_attach(pdev, bustype, TRUE);
 }
 
 void
 dhd_osl_detach(osl_t *osh)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (MALLOCED(osh)) {
 		DHD_ERROR(("%s: MEMORY LEAK %d bytes\n", __FUNCTION__, MALLOCED(osh)));
 	}
@@ -2508,6 +2598,8 @@ dhd_add_if(dhd_info_t *dhd, int ifidx, void *handle, char *name,
 	uint8 *mac_addr, uint32 flags, uint8 bssidx)
 {
 	dhd_if_t *ifp;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: idx %d, handle->%p\n", __FUNCTION__, ifidx, handle));
 
@@ -2551,6 +2643,8 @@ dhd_del_if(dhd_info_t *dhd, int ifidx)
 {
 	dhd_if_t *ifp;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: idx %d\n", __FUNCTION__, ifidx));
 
 	ASSERT(dhd && ifidx && (ifidx < DHD_MAX_IFS));
@@ -2593,6 +2687,8 @@ dhd_attach(osl_t *osh, struct dhd_bus *bus, uint bus_hdrlen)
 	struct net_device *net = NULL;
 
 	dhd_attach_states_t dhd_state = DHD_ATTACH_STATE_INIT;
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	/* updates firmware nvram path if it was provided as module parameters */
@@ -2817,6 +2913,8 @@ dhd_bus_start(dhd_pub_t *dhdp)
 
 	ASSERT(dhd);
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("Enter %s:\n", __FUNCTION__));
 
 #ifdef DHDTHREAD
@@ -2939,6 +3037,8 @@ dhd_concurrent_fw(dhd_pub_t *dhd)
 	int ret = 0;
 	char buf[WLC_IOCTL_SMLEN];
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if ((!op_mode) && (strstr(fw_path, "_p2p") == NULL) &&
 		(strstr(fw_path, "_apsta") == NULL)) {
 		/* Given path is for the STA firmware. Check whether P2P support is present in
@@ -3004,6 +3104,8 @@ dhd_preinit_ioctls(dhd_pub_t *dhd)
 #ifdef GET_CUSTOM_MAC_ENABLE
 	struct ether_addr ea_addr;
 #endif /* GET_CUSTOM_MAC_ENABLE */
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("Enter %s\n", __FUNCTION__));
 	dhd->op_mode = 0;
 #ifdef GET_CUSTOM_MAC_ENABLE
@@ -3357,6 +3459,8 @@ dhd_iovar(dhd_pub_t *pub, int ifidx, char *name, char *cmd_buf, uint cmd_len, in
 	wl_ioctl_t ioc;
 	int ret;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	len = bcm_mkiovar(name, cmd_buf, cmd_len, buf, len);
 
 	memset(&ioc, 0, sizeof(ioc));
@@ -3377,6 +3481,8 @@ int dhd_change_mtu(dhd_pub_t *dhdp, int new_mtu, int ifidx)
 {
 	struct dhd_info *dhd = dhdp->info;
 	struct net_device *dev = NULL;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	ASSERT(dhd && dhd->iflist[ifidx]);
 	dev = dhd->iflist[ifidx]->net;
@@ -3407,6 +3513,8 @@ aoe_update_host_ipv4_table(dhd_pub_t *dhd_pub, u32 ipa, bool add)
 	u32 ipv4_buf[MAX_IPV4_ENTRIES]; /* temp save for AOE host_ip table */
 	int i;
 	int ret;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	bzero(ipv4_buf, sizeof(ipv4_buf));
 
@@ -3459,6 +3567,8 @@ static int dhd_device_event(struct notifier_block *this,
 
 	dhd_info_t *dhd;
 	dhd_pub_t *dhd_pub;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (!ifa)
 		return NOTIFY_DONE;
@@ -3532,6 +3642,8 @@ dhd_net_attach(dhd_pub_t *dhdp, int ifidx)
 	struct net_device *net = NULL;
 	int err = 0;
 	uint8 temp_addr[ETHER_ADDR_LEN] = { 0x00, 0x90, 0x4c, 0x11, 0x22, 0x33 };
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: ifidx %d\n", __FUNCTION__, ifidx));
 
@@ -3636,6 +3748,8 @@ dhd_bus_detach(dhd_pub_t *dhdp)
 {
 	dhd_info_t *dhd;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	if (dhdp) {
@@ -3667,6 +3781,8 @@ void dhd_detach(dhd_pub_t *dhdp)
 	dhd_info_t *dhd;
 	unsigned long flags;
 	int timer_valid = FALSE;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (!dhdp)
 		return;
@@ -3798,6 +3914,8 @@ void
 dhd_free(dhd_pub_t *dhdp)
 {
 	dhd_info_t *dhd;
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	if (dhdp) {
@@ -3810,6 +3928,8 @@ dhd_free(dhd_pub_t *dhdp)
 static void __exit
 dhd_module_cleanup(void)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
 	dhd_bus_unregister();
@@ -3827,6 +3947,8 @@ static int __init
 dhd_module_init(void)
 {
 	int error = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -3914,6 +4036,8 @@ int
 dhd_os_proto_block(dhd_pub_t *pub)
 {
 	dhd_info_t * dhd = (dhd_info_t *)(pub->info);
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 
 	if (dhd) {
 		down(&dhd->proto_sem);
@@ -3927,6 +4051,8 @@ int
 dhd_os_proto_unblock(dhd_pub_t *pub)
 {
 	dhd_info_t * dhd = (dhd_info_t *)(pub->info);
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 
 	if (dhd) {
 		up(&dhd->proto_sem);
@@ -3939,12 +4065,16 @@ dhd_os_proto_unblock(dhd_pub_t *pub)
 unsigned int
 dhd_os_get_ioctl_resp_timeout(void)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	return ((unsigned int)dhd_ioctl_timeout_msec);
 }
 
 void
 dhd_os_set_ioctl_resp_timeout(unsigned int timeout_msec)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	dhd_ioctl_timeout_msec = (int)timeout_msec;
 }
 
@@ -3953,6 +4083,8 @@ dhd_os_ioctl_resp_wait(dhd_pub_t *pub, uint *condition, bool *pending)
 {
 	dhd_info_t * dhd = (dhd_info_t *)(pub->info);
 	int timeout;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	/* Convert timeout in millsecond to jiffies */
 	timeout = msecs_to_jiffies(dhd_ioctl_timeout_msec);
@@ -3965,6 +4097,8 @@ int
 dhd_os_ioctl_resp_wake(dhd_pub_t *pub)
 {
 	dhd_info_t *dhd = (dhd_info_t *)(pub->info);
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (waitqueue_active(&dhd->ioctl_resp_wait)) {
 		wake_up(&dhd->ioctl_resp_wait);
@@ -3979,6 +4113,8 @@ dhd_os_wd_timer(void *bus, uint wdtick)
 	dhd_pub_t *pub = bus;
 	dhd_info_t *dhd = (dhd_info_t *)pub->info;
 	unsigned long flags;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
@@ -4016,6 +4152,8 @@ dhd_os_open_image(char *filename)
 {
 	struct file *fp;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	fp = filp_open(filename, O_RDONLY, 0);
 	/*
 	 * 2.6.11 (FC4) supports filp_open() but later revs don't?
@@ -4035,6 +4173,8 @@ dhd_os_get_image_block(char *buf, int len, void *image)
 	struct file *fp = (struct file *)image;
 	int rdlen;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (!image)
 		return 0;
 
@@ -4048,6 +4188,8 @@ dhd_os_get_image_block(char *buf, int len, void *image)
 void
 dhd_os_close_image(void *image)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (image)
 		filp_close((struct file *)image, NULL);
 }
@@ -4057,6 +4199,8 @@ void
 dhd_os_sdlock(dhd_pub_t *pub)
 {
 	dhd_info_t *dhd;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	dhd = (dhd_info_t *)(pub->info);
 
@@ -4073,6 +4217,8 @@ dhd_os_sdunlock(dhd_pub_t *pub)
 {
 	dhd_info_t *dhd;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	dhd = (dhd_info_t *)(pub->info);
 
 #ifdef DHDTHREAD
@@ -4088,6 +4234,8 @@ dhd_os_sdlock_txq(dhd_pub_t *pub)
 {
 	dhd_info_t *dhd;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	dhd = (dhd_info_t *)(pub->info);
 	spin_lock_bh(&dhd->txqlock);
 }
@@ -4097,6 +4245,8 @@ dhd_os_sdunlock_txq(dhd_pub_t *pub)
 {
 	dhd_info_t *dhd;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	dhd = (dhd_info_t *)(pub->info);
 	spin_unlock_bh(&dhd->txqlock);
 }
@@ -4104,33 +4254,45 @@ dhd_os_sdunlock_txq(dhd_pub_t *pub)
 void
 dhd_os_sdlock_rxq(dhd_pub_t *pub)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 }
 
 void
 dhd_os_sdunlock_rxq(dhd_pub_t *pub)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 }
 
 void
 dhd_os_sdtxlock(dhd_pub_t *pub)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	dhd_os_sdlock(pub);
 }
 
 void
 dhd_os_sdtxunlock(dhd_pub_t *pub)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	dhd_os_sdunlock(pub);
 }
 
 #if defined(CONFIG_DHD_USE_STATIC_BUF)
 uint8* dhd_os_prealloc(void *osh, int section, uint size)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	return (uint8*)wl_android_prealloc(section, size);
 }
 
 void dhd_os_prefree(void *osh, void *addr, uint size)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 }
 #endif /* defined(CONFIG_DHD_USE_STATIC_BUF) */
 
@@ -4140,6 +4302,8 @@ dhd_get_wireless_stats(struct net_device *dev)
 {
 	int res = 0;
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (!dhd->pub.up) {
 		return NULL;
@@ -4160,6 +4324,8 @@ dhd_wl_host_event(dhd_info_t *dhd, int *ifidx, void *pktdata,
 {
 	int bcmerror = 0;
 	ASSERT(dhd != NULL);
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	bcmerror = wl_host_event(&dhd->pub, ifidx, pktdata, event, data);
 	if (bcmerror != BCME_OK)
@@ -4211,6 +4377,8 @@ dhd_wl_host_event(dhd_info_t *dhd, int *ifidx, void *pktdata,
 void
 dhd_sendup_event(dhd_pub_t *dhdp, wl_event_msg_t *event, void *data)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	switch (ntoh32(event->event_type)) {
 	/* Send up locally generated AMP HCI Events */
 	case WLC_E_BTA_HCI_EVENT: {
@@ -4314,6 +4482,8 @@ dhd_sendup_event(dhd_pub_t *dhdp, wl_event_msg_t *event, void *data)
 
 void dhd_wait_for_event(dhd_pub_t *dhd, bool *lockvar)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 0))
 	struct dhd_info *dhdinfo =  dhd->info;
 	int timeout = msecs_to_jiffies(2000);
@@ -4326,6 +4496,8 @@ void dhd_wait_for_event(dhd_pub_t *dhd, bool *lockvar)
 
 void dhd_wait_event_wakeup(dhd_pub_t *dhd)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 0))
 	struct dhd_info *dhdinfo =  dhd->info;
 	if (waitqueue_active(&dhdinfo->ctrl_wait))
@@ -4338,6 +4510,8 @@ int
 dhd_dev_reset(struct net_device *dev, uint8 flag)
 {
 	int ret;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
 
@@ -4362,6 +4536,8 @@ int net_os_set_suspend_disable(struct net_device *dev, int val)
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
 	int ret = 0;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd) {
 		ret = dhd->pub.suspend_disable_flag;
 		dhd->pub.suspend_disable_flag = val;
@@ -4373,6 +4549,8 @@ int net_os_set_suspend(struct net_device *dev, int val, int force)
 {
 	int ret = 0;
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (dhd) {
 #if defined(CONFIG_HAS_EARLYSUSPEND) && defined(DHD_USE_EARLYSUSPEND)
@@ -4391,6 +4569,8 @@ int net_os_set_dtim_skip(struct net_device *dev, int val)
 {
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd)
 		dhd->pub.dtim_skip = val;
 
@@ -4402,6 +4582,8 @@ int net_os_rxfilter_add_remove(struct net_device *dev, int add_remove, int num)
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
 	char *filterp = NULL;
 	int ret = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (!dhd || (num == DHD_UNICAST_FILTER_NUM) ||
 	    (num == DHD_MDNS_FILTER_NUM))
@@ -4431,6 +4613,8 @@ int dhd_os_set_packet_filter(dhd_pub_t *dhdp, int val)
 {
 	int ret = 0;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	/* Packet filtering is set only if we still in early-suspend and
 	 * we need either to turn it ON or turn it OFF
 	 * We can always turn it OFF in case of early-suspend, but we turn it
@@ -4450,6 +4634,8 @@ int net_os_set_packet_filter(struct net_device *dev, int val)
 {
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	return dhd_os_set_packet_filter(&dhd->pub, val);
 }
 
@@ -4457,6 +4643,8 @@ int
 dhd_dev_init_ioctl(struct net_device *dev)
 {
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	return dhd_preinit_ioctls(&dhd->pub);
 }
@@ -4468,6 +4656,8 @@ dhd_dev_pno_reset(struct net_device *dev)
 {
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	return (dhd_pno_clean(&dhd->pub));
 }
 
@@ -4477,6 +4667,8 @@ int
 dhd_dev_pno_enable(struct net_device *dev,  int pfn_enabled)
 {
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	return (dhd_pno_enable(&dhd->pub, pfn_enabled));
 }
@@ -4489,6 +4681,8 @@ dhd_dev_pno_set(struct net_device *dev, wlc_ssid_t* ssids_local, int nssid,
 {
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	return (dhd_pno_set(&dhd->pub, ssids_local, nssid, scan_fr, pno_repeat, pno_freq_expo_max));
 }
 
@@ -4498,6 +4692,8 @@ dhd_dev_pno_set_ex(struct net_device *dev, wl_pfn_t* ssidnet, int nssid,
 	ushort  pno_interval, int pno_repeat, int pno_expo_max, int pno_lost_time)
 {
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	return (dhd_pno_set_ex(&dhd->pub, ssidnet, nssid,
 					pno_interval, pno_repeat, pno_expo_max, pno_lost_time));
@@ -4509,6 +4705,8 @@ dhd_dev_get_pno_status(struct net_device *dev)
 {
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	return (dhd_pno_get_status(&dhd->pub));
 }
 
@@ -4519,6 +4717,8 @@ static void dhd_hang_process(struct work_struct *work)
 {
 	dhd_info_t *dhd;
 	struct net_device *dev;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	dhd = (dhd_info_t *)container_of(work, dhd_info_t, work_hang);
 	dev = dhd->iflist[0]->net;
@@ -4541,6 +4741,8 @@ int dhd_os_send_hang_message(dhd_pub_t *dhdp)
 {
 	int ret = 0;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhdp) {
 		if (!dhdp->hang_was_sent) {
 			dhdp->hang_was_sent = 1;
@@ -4557,6 +4759,8 @@ int net_os_send_hang_message(struct net_device *dev)
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
 	int ret = 0;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd)
 		ret = dhd_os_send_hang_message(&dhd->pub);
 
@@ -4566,6 +4770,8 @@ int net_os_send_hang_message(struct net_device *dev)
 void dhd_bus_country_set(struct net_device *dev, wl_country_t *cspec)
 {
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (dhd && dhd->pub.up) {
 		memcpy(&dhd->pub.dhd_cspec, cspec, sizeof(wl_country_t));
@@ -4579,6 +4785,8 @@ void dhd_bus_band_set(struct net_device *dev, uint band)
 {
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd && dhd->pub.up) {
 #ifdef WL_CFG80211
 		wl_update_wiphybands(NULL);
@@ -4589,17 +4797,23 @@ void dhd_bus_band_set(struct net_device *dev, uint band)
 void dhd_net_if_lock(struct net_device *dev)
 {
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	dhd_net_if_lock_local(dhd);
 }
 
 void dhd_net_if_unlock(struct net_device *dev)
 {
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	dhd_net_if_unlock_local(dhd);
 }
 
 static void dhd_net_if_lock_local(dhd_info_t *dhd)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 25))
 	if (dhd)
 		mutex_lock(&dhd->dhd_net_if_mutex);
@@ -4608,6 +4822,8 @@ static void dhd_net_if_lock_local(dhd_info_t *dhd)
 
 static void dhd_net_if_unlock_local(dhd_info_t *dhd)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 25))
 	if (dhd)
 		mutex_unlock(&dhd->dhd_net_if_mutex);
@@ -4618,6 +4834,8 @@ static void dhd_suspend_lock(dhd_pub_t *pub)
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 25))
 	dhd_info_t *dhd = (dhd_info_t *)(pub->info);
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd)
 		mutex_lock(&dhd->dhd_suspend_mutex);
 #endif
@@ -4627,6 +4845,8 @@ static void dhd_suspend_unlock(dhd_pub_t *pub)
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 25))
 	dhd_info_t *dhd = (dhd_info_t *)(pub->info);
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd)
 		mutex_unlock(&dhd->dhd_suspend_mutex);
 #endif
@@ -4636,6 +4856,8 @@ unsigned long dhd_os_spin_lock(dhd_pub_t *pub)
 {
 	dhd_info_t *dhd = (dhd_info_t *)(pub->info);
 	unsigned long flags = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (dhd)
 		spin_lock_irqsave(&dhd->dhd_lock, flags);
@@ -4647,6 +4869,8 @@ void dhd_os_spin_unlock(dhd_pub_t *pub, unsigned long flags)
 {
 	dhd_info_t *dhd = (dhd_info_t *)(pub->info);
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd)
 		spin_unlock_irqrestore(&dhd->dhd_lock, flags);
 }
@@ -4654,6 +4878,8 @@ void dhd_os_spin_unlock(dhd_pub_t *pub, unsigned long flags)
 static int
 dhd_get_pend_8021x_cnt(dhd_info_t *dhd)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	return (atomic_read(&dhd->pend_8021x_cnt));
 }
 
@@ -4666,6 +4892,8 @@ dhd_wait_pend8021x(struct net_device *dev)
 	int timeout = msecs_to_jiffies(10);
 	int ntimes = MAX_WAIT_FOR_8021X_TX;
 	int pend = dhd_get_pend_8021x_cnt(dhd);
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	while (ntimes && pend) {
 		if (pend) {
@@ -4687,6 +4915,8 @@ write_to_file(dhd_pub_t *dhd, uint8 *buf, int size)
 	struct file *fp;
 	mm_segment_t old_fs;
 	loff_t pos = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	/* change to KERNEL_DS address limit */
 	old_fs = get_fs();
@@ -4722,6 +4952,8 @@ int dhd_os_wake_lock_timeout(dhd_pub_t *pub)
 	unsigned long flags;
 	int ret = 0;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd) {
 		spin_lock_irqsave(&dhd->wakelock_spinlock, flags);
 		ret = dhd->wakelock_rx_timeout_enable > dhd->wakelock_ctrl_timeout_enable ?
@@ -4746,6 +4978,8 @@ int net_os_wake_lock_timeout(struct net_device *dev)
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
 	int ret = 0;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd)
 		ret = dhd_os_wake_lock_timeout(&dhd->pub);
 	return ret;
@@ -4755,6 +4989,8 @@ int dhd_os_wake_lock_rx_timeout_enable(dhd_pub_t *pub, int val)
 {
 	dhd_info_t *dhd = (dhd_info_t *)(pub->info);
 	unsigned long flags;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (dhd) {
 		spin_lock_irqsave(&dhd->wakelock_spinlock, flags);
@@ -4770,6 +5006,8 @@ int dhd_os_wake_lock_ctrl_timeout_enable(dhd_pub_t *pub, int val)
 	dhd_info_t *dhd = (dhd_info_t *)(pub->info);
 	unsigned long flags;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd) {
 		spin_lock_irqsave(&dhd->wakelock_spinlock, flags);
 		if (val > dhd->wakelock_ctrl_timeout_enable)
@@ -4784,6 +5022,8 @@ int net_os_wake_lock_rx_timeout_enable(struct net_device *dev, int val)
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
 	int ret = 0;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd)
 		ret = dhd_os_wake_lock_rx_timeout_enable(&dhd->pub, val);
 	return ret;
@@ -4793,6 +5033,8 @@ int net_os_wake_lock_ctrl_timeout_enable(struct net_device *dev, int val)
 {
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
 	int ret = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (dhd)
 		ret = dhd_os_wake_lock_ctrl_timeout_enable(&dhd->pub, val);
@@ -4804,6 +5046,8 @@ int dhd_os_wake_lock(dhd_pub_t *pub)
 	dhd_info_t *dhd = (dhd_info_t *)(pub->info);
 	unsigned long flags;
 	int ret = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (dhd) {
 		spin_lock_irqsave(&dhd->wakelock_spinlock, flags);
@@ -4823,6 +5067,8 @@ int net_os_wake_lock(struct net_device *dev)
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
 	int ret = 0;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd)
 		ret = dhd_os_wake_lock(&dhd->pub);
 	return ret;
@@ -4833,6 +5079,8 @@ int dhd_os_wake_unlock(dhd_pub_t *pub)
 	dhd_info_t *dhd = (dhd_info_t *)(pub->info);
 	unsigned long flags;
 	int ret = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	dhd_os_wake_lock_timeout(pub);
 	if (dhd) {
@@ -4856,6 +5104,8 @@ int dhd_os_check_wakelock(void *dhdp)
 	dhd_pub_t *pub = (dhd_pub_t *)dhdp;
 	dhd_info_t *dhd;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (!pub)
 		return 0;
 	dhd = (dhd_info_t *)(pub->info);
@@ -4871,6 +5121,8 @@ int net_os_wake_unlock(struct net_device *dev)
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
 	int ret = 0;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd)
 		ret = dhd_os_wake_unlock(&dhd->pub);
 	return ret;
@@ -4880,6 +5132,8 @@ int dhd_os_check_if_up(void *dhdp)
 {
 	dhd_pub_t *pub = (dhd_pub_t *)dhdp;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (!pub)
 		return 0;
 	return pub->up;
@@ -4888,6 +5142,8 @@ int dhd_os_check_if_up(void *dhdp)
 void dhd_set_version_info(dhd_pub_t *dhdp, char *fw)
 {
 	int i;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	i = snprintf(info_string, sizeof(info_string),
 		"  Driver: %s\n  Firmware: %s ", EPI_VERSION_STR, fw);
@@ -4904,6 +5160,8 @@ int dhd_ioctl_entry_local(struct net_device *net, wl_ioctl_t *ioc, int cmd)
 	int ifidx;
 	int ret = 0;
 	dhd_info_t *dhd = NULL;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (!net || !netdev_priv(net)) {
 		DHD_ERROR(("%s invalid parameter\n", __FUNCTION__));
@@ -4929,6 +5187,8 @@ bool dhd_os_check_hang(dhd_pub_t *dhdp, int ifidx, int ret)
 {
 	struct net_device *net;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	net = dhd_idx2net(dhdp, ifidx);
 	return dhd_check_hang(net, dhdp, ret);
 }
@@ -4941,6 +5201,8 @@ extern int dhd_wlfc_FIFOcreditmap_update(void* state, uint8* credits);
 int dhd_wlfc_interface_event(struct dhd_info *dhd,
 	ewlfc_mac_entry_action_t action, uint8 ifid, uint8 iftype, uint8* ea)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd->pub.wlfc_state == NULL)
 		return BCME_OK;
 
@@ -4949,6 +5211,8 @@ int dhd_wlfc_interface_event(struct dhd_info *dhd,
 
 int dhd_wlfc_FIFOcreditmap_event(struct dhd_info *dhd, uint8* event_data)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (dhd->pub.wlfc_state == NULL)
 		return BCME_OK;
 
@@ -4957,6 +5221,8 @@ int dhd_wlfc_FIFOcreditmap_event(struct dhd_info *dhd, uint8* event_data)
 
 int dhd_wlfc_event(struct dhd_info *dhd)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	return dhd_wlfc_enable(&dhd->pub);
 }
 #endif /* PROP_TXSTATUS */
@@ -4980,6 +5246,8 @@ dhd_dbgfs_t g_dbgfs;
 static int
 dhd_dbg_state_open(struct inode *inode, struct file *file)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	file->private_data = inode->i_private;
 	return 0;
 }
@@ -4992,6 +5260,8 @@ dhd_dbg_state_read(struct file *file, char __user *ubuf,
 	uint32 tmp;
 	loff_t pos = *ppos;
 	size_t ret;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (pos < 0)
 		return -EINVAL;
@@ -5022,6 +5292,8 @@ dhd_debugfs_write(struct file *file, const char __user *ubuf, size_t count, loff
 	size_t ret;
 	uint32 buf;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (pos < 0)
 		return -EINVAL;
 	if (pos >= g_dbgfs.size || !count)
@@ -5045,6 +5317,8 @@ dhd_debugfs_lseek(struct file *file, loff_t off, int whence)
 {
 	loff_t pos = -1;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	switch (whence) {
 		case 0:
 			pos = off;
@@ -5067,6 +5341,8 @@ static const struct file_operations dhd_dbg_state_ops = {
 
 static void dhd_dbg_create(void)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (g_dbgfs.debugfs_dir) {
 		g_dbgfs.debugfs_mem = debugfs_create_file("mem", 0644, g_dbgfs.debugfs_dir,
 			NULL, &dhd_dbg_state_ops);
@@ -5076,6 +5352,8 @@ static void dhd_dbg_create(void)
 void dhd_dbg_init(dhd_pub_t *dhdp)
 {
 	int err;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	g_dbgfs.dhdp = dhdp;
 	g_dbgfs.size = 0x20000000; /* Allow access to various cores regs */
@@ -5094,6 +5372,8 @@ void dhd_dbg_init(dhd_pub_t *dhdp)
 
 void dhd_dbg_remove(void)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	debugfs_remove(g_dbgfs.debugfs_mem);
 	debugfs_remove(g_dbgfs.debugfs_dir);
 
@@ -5113,6 +5393,8 @@ void dhd_htsf_addtxts(dhd_pub_t *dhdp, void *pktbuf)
 	uint16 dport = 0, oldmagic = 0xACAC;
 	char *p1;
 	htsfts_t ts;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	/*  timestamp packet  */
 
@@ -5151,6 +5433,8 @@ void dhd_htsf_addtxts(dhd_pub_t *dhdp, void *pktbuf)
 static void dhd_dump_htsfhisto(histo_t *his, char *s)
 {
 	int pktcnt = 0, curval = 0, i;
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	for (i = 0; i < (NUMBIN-2); i++) {
 		curval += 500;
 		printf("%d ",  his->bin[i]);
@@ -5164,6 +5448,8 @@ static
 void sorttobin(int value, histo_t *histo)
 {
 	int i, binval = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (value < 0) {
 		histo->bin[NUMBIN-1]++;
@@ -5192,6 +5478,8 @@ void dhd_htsf_addrxts(dhd_pub_t *dhdp, void *pktbuf)
 	int d1, d2, d3, end2end;
 	htsfts_t *htsf_ts;
 	uint32 htsf;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	skb = PKTTONATIVE(dhdp->osh, pktbuf);
 	p1 = (char*)PKTDATA(dhdp->osh, pktbuf);
@@ -5242,6 +5530,8 @@ uint32 dhd_get_htsf(dhd_info_t *dhd, int ifidx)
 	uint32    factor, baseval, baseval2;
 	cycles_t t;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	t = get_cycles();
 	cur_cycle = t;
 
@@ -5272,6 +5562,8 @@ static void dhd_dump_latency(void)
 {
 	int i, max = 0;
 	int d1, d2, d3, d4, d5;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	printf("T1       T2       T3       T4           d1  d2   t4-t1     i    \n");
 	for (i = 0; i < TSMAX; i++) {
@@ -5307,6 +5599,8 @@ dhd_ioctl_htsf_get(dhd_info_t *dhd, int ifidx)
 	char buf[32];
 	int ret;
 	uint32 s1, s2;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	struct tsf {
 		uint32 low;
@@ -5348,6 +5642,8 @@ void htsf_update(dhd_info_t *dhd, void *data)
 	uint32 hfactor = 0, cyc_delta, dec1 = 0, dec2, dec3, tmp;
 	ulong b, a;
 	cycles_t t;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	/* cycles_t in inlcude/mips/timex.h */
 

@@ -30,6 +30,7 @@
 
 #include <dngl_stats.h>
 #include <dhd.h>
+#include <dhd_dbg.h>
 
 #include <wlioctl.h>
 #include <wl_iw.h>
@@ -86,6 +87,8 @@ int dhd_customer_oob_irq_map(unsigned long *irq_flags_ptr)
 {
 	int  host_oob_irq = 0;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 #ifdef CUSTOMER_HW2
 	host_oob_irq = wifi_get_irq_number(irq_flags_ptr);
 
@@ -122,6 +125,8 @@ int dhd_customer_oob_irq_map(unsigned long *irq_flags_ptr)
 void
 dhd_customer_gpio_wlan_ctrl(int onoff)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	switch (onoff) {
 		case WLAN_RESET_OFF:
 			WL_TRACE(("%s: call customer specific GPIO to insert WLAN RESET\n",
@@ -173,6 +178,8 @@ int
 dhd_custom_get_mac_address(unsigned char *buf)
 {
 	int ret = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s Enter\n", __FUNCTION__));
 	if (!buf)
@@ -266,6 +273,8 @@ void get_customized_country_code(char *country_iso_code, wl_country_t *cspec)
 	return;
 #else
 	int size, i;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	size = ARRAYSIZE(translate_custom_table);
 

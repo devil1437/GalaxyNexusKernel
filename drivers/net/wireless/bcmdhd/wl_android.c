@@ -156,6 +156,8 @@ static int wl_android_get_link_speed(struct net_device *net, char *command, int 
 	int bytes_written;
 	int error;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	error = wldev_get_link_speed(net, &link_speed);
 	if (error)
 		return -1;
@@ -173,6 +175,8 @@ static int wl_android_get_rssi(struct net_device *net, char *command, int total_
 	int rssi;
 	int bytes_written = 0;
 	int error;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	error = wldev_get_rssi(net, &rssi);
 	if (error)
@@ -198,6 +202,8 @@ static int wl_android_set_suspendopt(struct net_device *dev, char *command, int 
 	int ret_now;
 	int ret = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	suspend_flag = *(command + strlen(CMD_SETSUSPENDOPT) + 1) - '0';
 
 	if (suspend_flag != 0)
@@ -217,6 +223,8 @@ static int wl_android_set_suspendopt(struct net_device *dev, char *command, int 
 static int wl_android_set_suspendmode(struct net_device *dev, char *command, int total_len)
 {
 	int ret = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 #if !defined(CONFIG_HAS_EARLYSUSPEND) || !defined(DHD_USE_EARLYSUSPEND)
 	int suspend_flag;
@@ -239,6 +247,8 @@ static int wl_android_get_band(struct net_device *dev, char *command, int total_
 	uint band;
 	int bytes_written;
 	int error;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	error = wldev_get_band(dev, &band);
 	if (error)
@@ -280,6 +290,8 @@ static int wl_android_set_pno_setup(struct net_device *dev, char *command, int t
 		0x00
 		};
 #endif /* PNO_SET_DEBUG */
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_INFO(("%s: command=%s, len=%d\n", __FUNCTION__, command, total_len));
 
@@ -360,6 +372,8 @@ static int wl_android_get_p2p_dev_addr(struct net_device *ndev, char *command, i
 	int ret;
 	int bytes_written = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	ret = wl_cfg80211_get_p2p_dev_addr(ndev, (struct ether_addr*)command);
 	if (ret)
 		return 0;
@@ -374,6 +388,8 @@ static int wl_android_get_p2p_dev_addr(struct net_device *ndev, char *command, i
 int wl_android_wifi_on(struct net_device *dev)
 {
 	int ret = 0;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	printk("%s in\n", __FUNCTION__);
 	if (!dev) {
@@ -402,6 +418,8 @@ int wl_android_wifi_off(struct net_device *dev)
 {
 	int ret = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	printk("%s in\n", __FUNCTION__);
 	if (!dev) {
 		DHD_TRACE(("%s: dev is null\n", __FUNCTION__));
@@ -422,6 +440,8 @@ int wl_android_wifi_off(struct net_device *dev)
 
 static int wl_android_set_fwpath(struct net_device *net, char *command, int total_len)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if ((strlen(command) - strlen(CMD_SETFWPATH)) > MOD_PARAM_PATHLEN)
 		return -1;
 	bcm_strncpy_s(fw_path, sizeof(fw_path),
@@ -442,6 +462,8 @@ int wl_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 	char *command = NULL;
 	int bytes_written = 0;
 	android_wifi_priv_cmd priv_cmd;
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	net_os_wake_lock(net);
 
@@ -621,6 +643,8 @@ int wl_android_init(void)
 {
 	int ret = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	dhd_msg_level |= DHD_ERROR_VAL;
 #ifdef ENABLE_INSMOD_NO_FW_LOAD
 	dhd_download_fw_on_driverload = FALSE;
@@ -638,11 +662,15 @@ int wl_android_exit(void)
 {
 	int ret = 0;
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	return ret;
 }
 
 void wl_android_post_init(void)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (!dhd_download_fw_on_driverload) {
 		/* Call customer gpio to turn off power with WL_REG_ON signal */
 		dhd_customer_gpio_wlan_ctrl(WLAN_RESET_OFF);
@@ -665,6 +693,8 @@ static void wifi_del_dev(void);
 int wl_android_wifictrl_func_add(void)
 {
 	int ret = 0;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	sema_init(&wifi_control_sem, 0);
 
 	ret = wifi_add_dev();
@@ -685,6 +715,8 @@ int wl_android_wifictrl_func_add(void)
 
 void wl_android_wifictrl_func_del(void)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (g_wifidev_registered)
 	{
 		wifi_del_dev();
@@ -695,6 +727,8 @@ void wl_android_wifictrl_func_del(void)
 void* wl_android_prealloc(int section, unsigned long size)
 {
 	void *alloc_ptr = NULL;
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (wifi_control_data && wifi_control_data->mem_prealloc) {
 		alloc_ptr = wifi_control_data->mem_prealloc(section, size);
 		if (alloc_ptr) {
@@ -711,6 +745,8 @@ void* wl_android_prealloc(int section, unsigned long size)
 
 int wifi_get_irq_number(unsigned long *irq_flags_ptr)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (wifi_irqres) {
 		*irq_flags_ptr = wifi_irqres->flags & IRQF_TRIGGER_MASK;
 		return (int)wifi_irqres->start;
@@ -724,6 +760,8 @@ int wifi_get_irq_number(unsigned long *irq_flags_ptr)
 
 int wifi_set_power(int on, unsigned long msec)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_ERROR(("%s = %d\n", __FUNCTION__, on));
 	if (wifi_control_data && wifi_control_data->set_power) {
 		wifi_control_data->set_power(on);
@@ -736,6 +774,8 @@ int wifi_set_power(int on, unsigned long msec)
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 35))
 int wifi_get_mac_addr(unsigned char *buf)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s\n", __FUNCTION__));
 	if (!buf)
 		return -EINVAL;
@@ -749,6 +789,8 @@ int wifi_get_mac_addr(unsigned char *buf)
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 39))
 void *wifi_get_country_code(char *ccode)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("%s\n", __FUNCTION__));
 	if (!ccode)
 		return NULL;
@@ -761,6 +803,8 @@ void *wifi_get_country_code(char *ccode)
 
 static int wifi_set_carddetect(int on)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_ERROR(("%s = %d\n", __FUNCTION__, on));
 	if (wifi_control_data && wifi_control_data->set_carddetect) {
 		wifi_control_data->set_carddetect(on);
@@ -772,6 +816,8 @@ static int wifi_probe(struct platform_device *pdev)
 {
 	struct wifi_platform_data *wifi_ctrl =
 		(struct wifi_platform_data *)(pdev->dev.platform_data);
+
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_ERROR(("## %s\n", __FUNCTION__));
 	wifi_irqres = platform_get_resource_byname(pdev, IORESOURCE_IRQ, "bcmdhd_wlan_irq");
@@ -792,6 +838,8 @@ static int wifi_remove(struct platform_device *pdev)
 	struct wifi_platform_data *wifi_ctrl =
 		(struct wifi_platform_data *)(pdev->dev.platform_data);
 
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_ERROR(("## %s\n", __FUNCTION__));
 	wifi_control_data = wifi_ctrl;
 
@@ -804,6 +852,8 @@ static int wifi_remove(struct platform_device *pdev)
 
 static int wifi_suspend(struct platform_device *pdev, pm_message_t state)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("##> %s\n", __FUNCTION__));
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 39)) && defined(OOB_INTR_ONLY)
 	bcmsdh_oob_intr_set(0);
@@ -813,6 +863,8 @@ static int wifi_suspend(struct platform_device *pdev, pm_message_t state)
 
 static int wifi_resume(struct platform_device *pdev)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("##> %s\n", __FUNCTION__));
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 39)) && defined(OOB_INTR_ONLY)
 	if (dhd_os_check_if_up(bcmsdh_get_drvdata()))
@@ -843,6 +895,8 @@ static struct platform_driver wifi_device_legacy = {
 
 static int wifi_add_dev(void)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("## Calling platform_driver_register\n"));
 	platform_driver_register(&wifi_device);
 	platform_driver_register(&wifi_device_legacy);
@@ -851,6 +905,8 @@ static int wifi_add_dev(void)
 
 static void wifi_del_dev(void)
 {
+	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_TRACE(("## Unregister platform_driver_register\n"));
 	platform_driver_unregister(&wifi_device);
 	platform_driver_unregister(&wifi_device_legacy);

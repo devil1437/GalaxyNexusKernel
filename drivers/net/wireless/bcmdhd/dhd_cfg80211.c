@@ -38,6 +38,7 @@ static int dhd_dongle_up = FALSE;
 #include <dhdioctl.h>
 #include <wlioctl.h>
 #include <dhd_cfg80211.h>
+#include <dhd_dbg.h>
 
 static s32 wl_dongle_up(struct net_device *ndev, u32 up);
 
@@ -47,12 +48,16 @@ static s32 wl_dongle_up(struct net_device *ndev, u32 up);
 
 s32 dhd_cfg80211_init(struct wl_priv *wl)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	dhd_dongle_up = FALSE;
 	return 0;
 }
 
 s32 dhd_cfg80211_deinit(struct wl_priv *wl)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	dhd_dongle_up = FALSE;
 	return 0;
 }
@@ -60,11 +65,15 @@ s32 dhd_cfg80211_deinit(struct wl_priv *wl)
 s32 dhd_cfg80211_get_opmode(struct wl_priv *wl)
 {
 	dhd_pub_t *dhd =  (dhd_pub_t *)(wl->pub);
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	return dhd->op_mode;
 }
 
 s32 dhd_cfg80211_down(struct wl_priv *wl)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	dhd_dongle_up = FALSE;
 	return 0;
 }
@@ -77,6 +86,8 @@ s32 dhd_cfg80211_set_p2p_info(struct wl_priv *wl, int val)
 	dhd_pub_t *dhd =  (dhd_pub_t *)(wl->pub);
 	int bcn_timeout = DHD_BEACON_TIMEOUT_HIGH;
 	char iovbuf[30];
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	dhd->op_mode |= val;
 	WL_ERR(("Set : op_mode=%d\n", dhd->op_mode));
@@ -106,6 +117,8 @@ s32 dhd_cfg80211_clean_p2p_info(struct wl_priv *wl)
 	int bcn_timeout = DHD_BEACON_TIMEOUT_NORMAL;
 	char iovbuf[30];
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	dhd->op_mode &= ~CONCURENT_MASK;
 	WL_ERR(("Clean : op_mode=%d\n", dhd->op_mode));
 
@@ -127,6 +140,8 @@ static s32 wl_dongle_up(struct net_device *ndev, u32 up)
 {
 	s32 err = 0;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	err = wldev_ioctl(ndev, WLC_UP, &up, sizeof(up), true);
 	if (unlikely(err)) {
 		WL_ERR(("WLC_UP error (%d)\n", err));
@@ -141,6 +156,8 @@ s32 dhd_config_dongle(struct wl_priv *wl, bool need_lock)
 #endif
 	struct net_device *ndev;
 	s32 err = 0;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("In\n"));
 	if (dhd_dongle_up) {
@@ -203,6 +220,8 @@ dev_wlc_intvar_get_reg(struct net_device *dev, char *name,
 	} var;
 	int error;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	bcm_mkiovar(name, (char *)(&reg), sizeof(reg),
 		(char *)(&var), sizeof(var.buf));
 	error = wldev_ioctl(dev, WLC_GET_VAR, (char *)(&var), sizeof(var.buf), false);
@@ -220,6 +239,8 @@ dev_wlc_bufvar_set(struct net_device *dev, char *name, char *buf, int len)
 	static char ioctlbuf_local[1024];
 #endif /* LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 31) */
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	bcm_mkiovar(name, buf, len, ioctlbuf_local, sizeof(ioctlbuf_local));
 
 	return (wldev_ioctl(dev, WLC_SET_VAR, ioctlbuf_local, sizeof(ioctlbuf_local), true));
@@ -232,6 +253,8 @@ static int
 dev_wlc_intvar_set_reg(struct net_device *dev, char *name, char *addr, char * val)
 {
 	char reg_addr[8];
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	memset(reg_addr, 0, sizeof(reg_addr));
 	memcpy((char *)&reg_addr[0], (char *)addr, 4);
@@ -247,6 +270,8 @@ static bool btcoex_is_sco_active(struct net_device *dev)
 	int sco_id_cnt = 0;
 	int param27;
 	int i;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	for (i = 0; i < 12; i++) {
 
@@ -299,6 +324,8 @@ static int set_btc_esco_params(struct net_device *dev, bool trump_sco)
 	static uint32 saved_reg64;
 	static uint32 saved_reg65;
 	static uint32 saved_reg71;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	if (trump_sco) {
 		/* this should reduce eSCO agressive retransmit
@@ -389,6 +416,8 @@ wl_cfg80211_bt_setflag(struct net_device *dev, bool set)
 	char buf_flag7_default[8]   = { 7, 00, 00, 00, 0x0, 0x00, 0x00, 0x00};
 #endif
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 
 #if defined(BT_DHCP_eSCO_FIX)
 	/* set = 1, save & turn on  0 - off & restore prev settings */
@@ -413,6 +442,8 @@ wl_cfg80211_bt_setflag(struct net_device *dev, bool set)
 static void wl_cfg80211_bt_timerfunc(ulong data)
 {
 	struct btcoex_info *bt_local = (struct btcoex_info *)data;
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s\n", __FUNCTION__));
 	bt_local->timer_on = 0;
 	schedule_work(&bt_local->work);
@@ -421,6 +452,8 @@ static void wl_cfg80211_bt_timerfunc(ulong data)
 static void wl_cfg80211_bt_handler(struct work_struct *work)
 {
 	struct btcoex_info *btcx_inf;
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	btcx_inf = container_of(work, struct btcoex_info, work);
 
@@ -498,6 +531,8 @@ int wl_cfg80211_btcoex_init(struct wl_priv *wl)
 {
 	struct btcoex_info *btco_inf = NULL;
 
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	btco_inf = kmalloc(sizeof(struct btcoex_info), GFP_KERNEL);
 	if (!btco_inf)
 		return -ENOMEM;
@@ -521,6 +556,8 @@ int wl_cfg80211_btcoex_init(struct wl_priv *wl)
 
 void wl_cfg80211_btcoex_deinit(struct wl_priv *wl)
 {
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
+
 	if (!wl->btcoex_info)
 		return;
 
@@ -554,6 +591,8 @@ int wl_cfg80211_set_btcoex_dhcp(struct net_device *dev, char *command)
 	char buf_flag7_default[8] =   { 7, 00, 00, 00, 0x0, 0x00, 0x00, 0x00};
 	struct btcoex_info *btco_inf = wl->btcoex_info;
 #endif /* COEX_DHCP */
+
+	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	/* Figure out powermode 1 or o command */
 	strncpy((char *)&powermode_val, command + strlen("BTCOEXMODE") +1, 1);

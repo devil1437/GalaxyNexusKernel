@@ -49,6 +49,7 @@ typedef const struct si_pub  si_t;
 #include <proto/ethernet.h>
 #include <dngl_stats.h>
 #include <dhd.h>
+#define WL_MYTRACE(args) printf args
 #define WL_ERROR(x) printf x
 #define WL_TRACE(x)
 #define WL_ASSOC(x)
@@ -367,6 +368,8 @@ dev_wlc_ioctl(
 	mm_segment_t fs;
 	int ret = -EINVAL;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (!dev) {
 		WL_ERROR(("%s: dev is null\n", __FUNCTION__));
 		return ret;
@@ -427,6 +430,8 @@ dev_wlc_intvar_get_reg(
 	int error;
 
 	uint len;
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	len = bcm_mkiovar(name, (char *)(&reg), sizeof(reg), (char *)(&var), sizeof(var.buf));
 	ASSERT(len);
 	error = dev_wlc_ioctl(dev, WLC_GET_VAR, (void *)&var, len);
@@ -444,6 +449,8 @@ dev_wlc_intvar_set_reg(
 	char * val)
 {
 	char reg_addr[8];
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	memset(reg_addr, 0, sizeof(reg_addr));
 	memcpy((char *)&reg_addr[0], (char *)addr, 4);
@@ -464,6 +471,8 @@ dev_wlc_intvar_set(
 	char buf[WLC_IOCTL_SMLEN];
 	uint len;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	val = htod32(val);
 	len = bcm_mkiovar(name, (char *)(&val), sizeof(val), buf, sizeof(buf));
 	ASSERT(len);
@@ -482,6 +491,8 @@ dev_iw_iovar_setbuf(
 	int buflen)
 {
 	int iolen;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	iolen = bcm_mkiovar(iovar, param, paramlen, bufptr, buflen);
 	ASSERT(iolen);
@@ -502,6 +513,8 @@ dev_iw_iovar_getbuf(
 	int buflen)
 {
 	int iolen;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	iolen = bcm_mkiovar(iovar, param, paramlen, bufptr, buflen);
 	ASSERT(iolen);
@@ -525,6 +538,8 @@ dev_wlc_bufvar_set(
 #endif 
 	uint buflen;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	buflen = bcm_mkiovar(name, buf, len, ioctlbuf, sizeof(ioctlbuf));
 	ASSERT(buflen);
 
@@ -546,6 +561,8 @@ dev_wlc_bufvar_get(
 #endif 
 	int error;
 	uint len;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	len = bcm_mkiovar(name, NULL, 0, ioctlbuf, sizeof(ioctlbuf));
 	ASSERT(len);
@@ -573,6 +590,8 @@ dev_wlc_intvar_get(
 	uint len;
 	uint data_null;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	len = bcm_mkiovar(name, (char *)(&data_null), 0, (char *)(&var), sizeof(var.buf));
 	ASSERT(len);
 	error = dev_wlc_ioctl(dev, WLC_GET_VAR, (void *)&var, len);
@@ -595,6 +614,8 @@ wl_iw_set_active_scan(
 	int as = 0;
 	int error = 0;
 	char *p = extra;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 #if defined(WL_IW_USE_ISCAN)
 	if (g_iscan->iscan_state == ISCAN_STATE_IDLE)
@@ -621,6 +642,8 @@ wl_iw_set_passive_scan(
 	int ps = 1;
 	int error = 0;
 	char *p = extra;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 #if defined(WL_IW_USE_ISCAN)
 	if (g_iscan->iscan_state == ISCAN_STATE_IDLE) {
@@ -655,6 +678,8 @@ wl_iw_set_txpower(
 	char *p = extra;
 	int txpower = -1;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	txpower = bcm_atoi(extra + strlen(TXPOWER_SET_CMD) + 1);
 	if ((txpower >= 0) && (txpower <= 127))
 	{
@@ -686,6 +711,8 @@ wl_iw_get_macaddr(
 	struct ether_addr *id;
 	char *p = extra;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	
 	strcpy(buf, "cur_etheraddr");
 	error = dev_wlc_ioctl(dev, WLC_GET_VAR, buf, sizeof(buf));
@@ -716,6 +743,8 @@ wl_iw_set_country(
 	wl_country_t cspec = {{0}, 0, {0}};
 	char smbuf[WLC_IOCTL_SMLEN];
 	scb_val_t scbval;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	cspec.rev = -1;
 	memset(country_code, 0, sizeof(country_code));
@@ -778,6 +807,8 @@ wl_iw_set_power_mode(
 	int  pm_local = PM_OFF;
 	char powermode_val = 0;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE_COEX(("%s: DHCP session cmd:%s\n", __FUNCTION__, extra));
 
 	strncpy((char *)&powermode_val, extra + strlen("POWERMODE") +1, 1);
@@ -835,6 +866,8 @@ bool btcoex_is_sco_active(struct net_device *dev)
 	int param27;
 	int i;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	for (i = 0; i < 12; i++) {
 
 		ioc_res = dev_wlc_intvar_get_reg(dev, "btc_params", 27, &param27);
@@ -882,6 +915,8 @@ static int set_btc_esco_params(struct net_device *dev, bool trump_sco)
 	static uint32 saved_reg64;
 	static uint32 saved_reg65;
 	static uint32 saved_reg71;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (trump_sco) { 
 
@@ -971,6 +1006,8 @@ wl_iw_get_power_mode(
 	int pm_local;
 	char *p = extra;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	error = dev_wlc_ioctl(dev, WLC_GET_PM, &pm_local, sizeof(pm_local));
 	if (!error) {
 		WL_TRACE(("%s: Powermode = %d\n", __func__, pm_local));
@@ -1012,6 +1049,8 @@ wl_iw_set_btcoex_dhcp(
 #ifdef COEX_DHCP
 	char buf_flag7_default[8] =   { 7, 00, 00, 00, 0x0, 0x00, 0x00, 0x00};
 #endif 
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	
 	strncpy((char *)&powermode_val, extra + strlen("BTCOEXMODE") +1, 1);
@@ -1130,6 +1169,8 @@ char *extra
 	int ret_now;
 	int ret = 0;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	suspend_flag = *(extra + strlen(SETSUSPENDOPT_CMD) + 1) - '0';
 
 	if (suspend_flag != 0)
@@ -1161,6 +1202,8 @@ char *extra
 #if !defined(CONFIG_HAS_EARLYSUSPEND) || !defined(DHD_USE_EARLYSUSPEND)
 	int suspend_flag;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	suspend_flag = *(extra + strlen(SETSUSPENDMODE_CMD) + 1) - '0';
 
 	if (suspend_flag != 0)
@@ -1179,6 +1222,8 @@ wl_format_ssid(char* ssid_buf, uint8* ssid, int ssid_len)
 {
 	int i, c;
 	char *p = ssid_buf;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (ssid_len > 32) ssid_len = 32;
 
@@ -1210,6 +1255,8 @@ wl_iw_get_link_speed(
 	char *p = extra;
 	static int link_speed;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	
 	net_os_wake_lock(dev);
 	if (g_onoff == G_WLAN_SET_ON) {
@@ -1237,6 +1284,8 @@ wl_iw_get_dtim_skip(
 	int error = -1;
 	char *p = extra;
 	char iovbuf[32];
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	net_os_wake_lock(dev);
 	if (g_onoff == G_WLAN_SET_ON) {
@@ -1272,6 +1321,8 @@ wl_iw_set_dtim_skip(
 	char *p = extra;
 	int bcn_li_dtim;
 	char iovbuf[32];
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	net_os_wake_lock(dev);
 	if (g_onoff == G_WLAN_SET_ON) {
@@ -1323,6 +1374,8 @@ wl_iw_get_band(
 	char *p = extra;
 	static int band;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	net_os_wake_lock(dev);
 
 	if (g_onoff == G_WLAN_SET_ON) {
@@ -1349,6 +1402,8 @@ wl_iw_set_band(
 	int error = -1;
 	char *p = extra;
 	uint band;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	net_os_wake_lock(dev);
 
@@ -1393,6 +1448,8 @@ wl_iw_set_pno_reset(
 	int error = -1;
 	char *p = extra;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	net_os_wake_lock(dev);
 	if ((g_onoff == G_WLAN_SET_ON) && (dev != NULL)) {
 
@@ -1425,6 +1482,8 @@ wl_iw_set_pno_enable(
 	int error = -1;
 	char *p = extra;
 	int pfn_enabled;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	net_os_wake_lock(dev);
 	pfn_enabled = htod32((uint)*(extra + strlen(PNOENABLE_SET_CMD) + 1) - '0');
@@ -1486,6 +1545,8 @@ wl_iw_set_pno_set(
 		0x00
 		};
 #endif 
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	net_os_wake_lock(dev);
 	WL_ERROR(("\n### %s: info->cmd:%x, info->flags:%x, u.data=0x%p, u.len=%d\n",
@@ -1599,6 +1660,8 @@ wl_iw_set_pno_setadd(
 	char *tmp_ptr;
 	int size, tmp_size;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	net_os_wake_lock(dev);
 	WL_ERROR(("\n### %s: info->cmd:%x, info->flags:%x, u.data=0x%p, u.len=%d\n",
 		__FUNCTION__, info->cmd, info->flags,
@@ -1660,6 +1723,8 @@ wl_iw_get_rssi(
 	static char ssidbuf[SSID_FMT_BUF_LEN];
 	scb_val_t scb_val;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	net_os_wake_lock(dev);
 
 	bzero(&scb_val, sizeof(scb_val_t));
@@ -1697,6 +1762,8 @@ wl_iw_send_priv_event(
 	char extra[IW_CUSTOM_MAX + 1];
 	int cmd;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	cmd = IWEVCUSTOM;
 	memset(&wrqu, 0, sizeof(wrqu));
 	if (strlen(flag) > sizeof(extra))
@@ -1717,6 +1784,8 @@ wl_control_wl_start(struct net_device *dev)
 {
 	wl_iw_t *iw;
 	int ret = 0;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("Enter %s \n", __FUNCTION__));
 
@@ -1766,6 +1835,8 @@ wl_iw_control_wl_off(
 {
 	wl_iw_t *iw;
 	int ret = 0;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("Enter %s\n", __FUNCTION__));
 
@@ -1836,6 +1907,8 @@ wl_iw_control_wl_on(
 )
 {
 	int ret = 0;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("Enter %s \n", __FUNCTION__));
 
@@ -1913,6 +1986,8 @@ init_ap_profile_from_string(char *param_str, struct ap_profile *ap_cfg)
 	char sub_cmd[16];
 	int ret = 0;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	memset(sub_cmd, 0, sizeof(sub_cmd));
 	memset(ap_cfg, 0, sizeof(struct ap_profile));
 
@@ -1966,6 +2041,8 @@ iwpriv_set_ap_config(struct net_device *dev,
 	int res = 0;
 	char  *extra = NULL;
 	struct ap_profile *ap_cfg = &my_ap;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("> Got IWPRIV SET_AP IOCTL: info->cmd:%x, info->flags:%x, u.data:%p, u.len:%d\n",
 		info->cmd, info->flags,
@@ -2035,6 +2112,8 @@ static int iwpriv_get_assoc_list(struct net_device *dev,
 	char *p_mac_str;
 	char *p_mac_str_end;
 	wl_iw_t *iw;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if ((!dev) || (!extra)) {
 		
@@ -2144,6 +2223,8 @@ static int iwpriv_set_mac_filters(struct net_device *dev,
 	struct ether_addr *p_ea;
 	struct mac_list_set mflist_set; 
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_SOFTAP((">>> Got IWPRIV SET_MAC_FILTER IOCTL:  info->cmd:%x,"
 			"info->flags:%x, u.data:%p, u.len:%d\n",
 			info->cmd, info->flags,
@@ -2238,6 +2319,8 @@ static int iwpriv_set_ap_sta_disassoc(struct net_device *dev,
 	char cmd_buf[256];
 	char *str_ptr = cmd_buf;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_SOFTAP((">>%s called\n args: info->cmd:%x,"
 		" info->flags:%x, u.data.p:%p, u.data.len:%d\n",
 		__FUNCTION__, info->cmd, info->flags,
@@ -2288,6 +2371,8 @@ wl_iw_config_commit(
 	int error;
 	struct sockaddr bssid;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCSIWCOMMIT\n", dev->name));
 
 	if ((error = dev_wlc_ioctl(dev, WLC_GET_SSID, &ssid, sizeof(ssid))))
@@ -2315,6 +2400,8 @@ wl_iw_get_name(
 	char *extra
 )
 {
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCGIWNAME\n", dev->name));
 
 	strcpy(cwrq, "IEEE 802.11-DS");
@@ -2332,6 +2419,8 @@ wl_iw_set_freq(
 {
 	int error, chan;
 	uint sf = 0;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s %s: SIOCSIWFREQ\n", __FUNCTION__, dev->name));
 
@@ -2386,6 +2475,8 @@ wl_iw_get_freq(
 	channel_info_t ci;
 	int error;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCGIWFREQ\n", dev->name));
 
 	if ((error = dev_wlc_ioctl(dev, WLC_GET_CHANNEL, &ci, sizeof(ci))))
@@ -2406,6 +2497,8 @@ wl_iw_set_mode(
 )
 {
 	int infra = 0, ap = 0, error = 0;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s: SIOCSIWMODE\n", dev->name));
 
@@ -2443,6 +2536,8 @@ wl_iw_get_mode(
 {
 	int error, infra = 0, ap = 0;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCGIWMODE\n", dev->name));
 
 	if ((error = dev_wlc_ioctl(dev, WLC_GET_INFRA, &infra, sizeof(infra))) ||
@@ -2479,6 +2574,8 @@ wl_iw_get_range(
 		{14, 29, 43, 58, 87, 116, 130, 144},
 		{27, 54, 81, 108, 162, 216, 243, 270},
 		{30, 60, 90, 120, 180, 240, 270, 300}};
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s: SIOCGIWRANGE\n", dev->name));
 
@@ -2685,6 +2782,8 @@ wl_iw_set_spy(
 	struct sockaddr *addr = (struct sockaddr *) extra;
 	int i;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCSIWSPY\n", dev->name));
 
 	if (!extra)
@@ -2711,6 +2810,8 @@ wl_iw_get_spy(
 	struct iw_quality *qual = (struct iw_quality *) &addr[iw->spy_num];
 	int i;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCGIWSPY\n", dev->name));
 
 	if (!extra)
@@ -2732,6 +2833,8 @@ static int
 wl_iw_ch_to_chanspec(int ch, wl_join_params_t *join_params, int *join_params_size)
 {
 	chanspec_t chanspec = 0;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (ch != 0) {
 		
@@ -2775,6 +2878,8 @@ wl_iw_set_wap(
 	int error = -EINVAL;
 	wl_join_params_t join_params;
 	int join_params_size;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s: SIOCSIWAP\n", dev->name));
 
@@ -2831,6 +2936,8 @@ wl_iw_get_wap(
 	char *extra
 )
 {
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCGIWAP\n", dev->name));
 
 	awrq->sa_family = ARPHRD_ETHER;
@@ -2854,6 +2961,8 @@ wl_iw_mlme(
 	struct iw_mlme *mlme;
 	scb_val_t scbval;
 	int error  = -EINVAL;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s: SIOCSIWMLME DISASSOC/DEAUTH\n", dev->name));
 
@@ -2899,6 +3008,8 @@ wl_iw_get_aplist(
 	wl_bss_info_t *bi = NULL;
 	int error, i;
 	uint buflen = dwrq->length;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s: SIOCGIWAPLIST\n", dev->name));
 
@@ -2982,6 +3093,8 @@ wl_iw_iscan_get_aplist(
 	wl_bss_info_t *bi = NULL;
 	int i;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCGIWAPLIST\n", dev->name));
 
 	if (!extra)
@@ -3045,6 +3158,8 @@ wl_iw_iscan_prep(wl_scan_params_t *params, wlc_ssid_t *ssid)
 {
 	int err = 0;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	memcpy(&params->bssid, &ether_bcast, ETHER_ADDR_LEN);
 	params->bss_type = DOT11_BSSTYPE_ANY;
 	params->scan_type = 0;
@@ -3074,6 +3189,8 @@ wl_iw_iscan(iscan_info_t *iscan, wlc_ssid_t *ssid, uint16 action)
 {
 	int err = 0;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	iscan->iscan_ex_params_p->version = htod32(ISCAN_REQ_VERSION);
 	iscan->iscan_ex_params_p->action = htod16(action);
 	iscan->iscan_ex_params_p->scan_duration = htod16(0);
@@ -3098,6 +3215,8 @@ static void
 wl_iw_timerfunc(ulong data)
 {
 	iscan_info_t *iscan = (iscan_info_t *)data;
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (iscan) {
 		iscan->timer_on = 0;
 		if (iscan->iscan_state != ISCAN_STATE_IDLE) {
@@ -3112,6 +3231,8 @@ wl_iw_set_event_mask(struct net_device *dev)
 {
 	char eventmask[WL_EVENTING_MASK_LEN];
 	char iovbuf[WL_EVENTING_MASK_LEN + 12];	
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	dev_iw_iovar_getbuf(dev, "event_msgs", "", 0, iovbuf, sizeof(iovbuf));
 	bcopy(iovbuf, eventmask, WL_EVENTING_MASK_LEN);
@@ -3130,6 +3251,8 @@ wl_iw_iscan_get(iscan_info_t *iscan)
 	wl_scan_results_t *results;
 	uint32 status;
 	int res = 0;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_OS_MUTEX_LOCK(&wl_cache_lock);
 	if (iscan->list_cur) {
@@ -3190,6 +3313,8 @@ wl_iw_iscan_get(iscan_info_t *iscan)
 static void
 wl_iw_force_specific_scan(iscan_info_t *iscan)
 {
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s force Specific SCAN for %s\n", __FUNCTION__, g_specific_ssid.SSID));
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 27))
 	rtnl_lock();
@@ -3206,6 +3331,8 @@ static void
 wl_iw_send_scan_complete(iscan_info_t *iscan)
 {
 	union iwreq_data wrqu;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	memset(&wrqu, 0, sizeof(wrqu));
 
@@ -3228,6 +3355,8 @@ _iscan_sysioc_thread(void *data)
 
 
 	static bool iscan_pass_abort = FALSE;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DAEMONIZE("iscan_sysioc");
 
@@ -3334,6 +3463,8 @@ static void
 wl_iw_set_ss_cache_timer_flag(void)
 {
 	g_ss_cache_ctrl.m_timer_expired = 1;
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s called\n", __FUNCTION__));
 }
 
@@ -3341,6 +3472,8 @@ wl_iw_set_ss_cache_timer_flag(void)
 static int
 wl_iw_init_ss_cache_ctrl(void)
 {
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s :\n", __FUNCTION__));
 	g_ss_cache_ctrl.m_prev_scan_mode = 0;
 	g_ss_cache_ctrl.m_cons_br_scan_cnt = 0;
@@ -3366,6 +3499,8 @@ wl_iw_free_ss_cache(void)
 {
 	wl_iw_ss_cache_t *node, *cur;
 	wl_iw_ss_cache_t **spec_scan_head;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s called\n", __FUNCTION__));
 
@@ -3414,6 +3549,8 @@ wl_iw_run_ss_cache_timer(int kick_off)
 static void
 wl_iw_release_ss_cache_ctrl(void)
 {
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s :\n", __FUNCTION__));
 	wl_iw_free_ss_cache();
 	wl_iw_run_ss_cache_timer(0);
@@ -3429,6 +3566,8 @@ wl_iw_reset_ss_cache(void)
 {
 	wl_iw_ss_cache_t *node, *prev, *cur;
 	wl_iw_ss_cache_t **spec_scan_head;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_OS_MUTEX_LOCK(&wl_cache_lock);
 	spec_scan_head = &g_ss_cache_ctrl.m_cache_head;
@@ -3469,6 +3608,8 @@ wl_iw_add_bss_to_ss_cache(wl_scan_results_t *ss_list)
 	wl_iw_ss_cache_t **spec_scan_head;
 	wl_bss_info_t *bi = NULL;
 	int i;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	
 	if (!ss_list->count) {
@@ -3534,6 +3675,8 @@ __u16 *merged_len)
 	wl_iw_ss_cache_t *node;
 	wl_scan_results_t *list_merge;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	DHD_OS_MUTEX_LOCK(&wl_cache_lock);
 	node = g_ss_cache_ctrl.m_cache_head;
 	for (;node;) {
@@ -3560,6 +3703,8 @@ wl_iw_delete_bss_from_ss_cache(void *addr)
 
 	wl_iw_ss_cache_t *node, *prev;
 	wl_iw_ss_cache_t **spec_scan_head;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_OS_MUTEX_LOCK(&wl_cache_lock);
 	spec_scan_head = &g_ss_cache_ctrl.m_cache_head;
@@ -3599,6 +3744,8 @@ wl_iw_set_scan(
 )
 {
 	int error;
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("\n:%s dev:%s: SIOCSIWSCAN : SCAN\n", __FUNCTION__, dev->name));
 
 #ifdef OEM_CHROMIUMOS
@@ -3679,6 +3826,8 @@ wl_iw_iscan_set_scan_broadcast_prep(struct net_device *dev, uint flag)
 	wlc_ssid_t ssid;
 	iscan_info_t *iscan = g_iscan;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 #if defined(CONFIG_FIRST_SCAN)
 	
 	if (g_first_broadcast_scan == BROADCAST_SCAN_FIRST_IDLE) {
@@ -3733,6 +3882,8 @@ wl_iw_iscan_set_scan(
 	wlc_ssid_t ssid;
 	iscan_info_t *iscan = g_iscan;
 	int ret = 0;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE_SCAN(("%s: SIOCSIWSCAN : ISCAN\n", dev->name));
 
@@ -3838,6 +3989,8 @@ ie_is_wpa_ie(uint8 **wpaie, uint8 **tlvs, int *tlvs_len)
 
 	uint8 *ie = *wpaie;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	
 	if ((ie[1] >= 6) &&
 		!bcmp((const void *)&ie[2], (const void *)(WPA_OUI "\x01"), 4)) {
@@ -3859,6 +4012,8 @@ ie_is_wps_ie(uint8 **wpsie, uint8 **tlvs, int *tlvs_len)
 
 
 	uint8 *ie = *wpsie;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	
 	if ((ie[1] >= 4) &&
@@ -3884,6 +4039,8 @@ wl_iw_handle_scanresults_ies(char **event_p, char *end,
 #if WIRELESS_EXT > 17
 	struct iw_event	iwe;
 	char *event;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	event = *event_p;
 	if (bi->ie_length) {
@@ -3940,6 +4097,8 @@ wl_iw_get_scan_prep(
 	wl_bss_info_t *bi = NULL;
 	char *event = extra, *end = extra + max_size - WE_ADD_EVENT_FIX, *value;
 	int	ret = 0;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!list) {
 		WL_ERROR(("%s: Null list pointer", __FUNCTION__));
@@ -4059,6 +4218,8 @@ wl_iw_get_scan(
 	uint32 counter = 0;
 #endif 
 #endif 
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s: buflen_from_user %d: \n", dev->name, buflen_from_user));
 
@@ -4243,6 +4404,8 @@ wl_iw_iscan_get_scan(
 	__u16 merged_len = 0;
 	uint buflen_from_user = dwrq->length;
 #endif
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s %s buflen_from_user %d:\n", dev->name, __FUNCTION__, dwrq->length));
 
@@ -4430,6 +4593,8 @@ check_prescan(wl_join_params_t *join_params, int *join_params_size)
 	wl_scan_results_t *list;
 	char *destbuf;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	buf = iscan->list_hdr;
 
 	while (buf) {
@@ -4501,6 +4666,8 @@ wl_iw_set_essid(
 	int error;
 	wl_join_params_t *join_params;
 	int join_params_size;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s: SIOCSIWESSID\n", dev->name));
 
@@ -4587,6 +4754,8 @@ wl_iw_get_essid(
 	wlc_ssid_t ssid;
 	int error;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCGIWESSID\n", dev->name));
 
 	if (!extra)
@@ -4619,6 +4788,8 @@ wl_iw_set_nick(
 {
 	wl_iw_t *iw = NETDEV_PRIV(dev);
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCSIWNICKN\n", dev->name));
 
 	if (!extra)
@@ -4644,6 +4815,8 @@ wl_iw_get_nick(
 {
 	wl_iw_t *iw = NETDEV_PRIV(dev);
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCGIWNICKN\n", dev->name));
 
 	if (!extra)
@@ -4665,6 +4838,8 @@ wl_iw_set_rate(
 {
 	wl_rateset_t rateset;
 	int error, rate, i, error_bg, error_a;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s: SIOCSIWRATE\n", dev->name));
 
@@ -4726,6 +4901,8 @@ wl_iw_get_rate(
 {
 	int error, rate;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCGIWRATE\n", dev->name));
 
 	
@@ -4746,6 +4923,8 @@ wl_iw_set_rts(
 )
 {
 	int error, rts;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s: SIOCSIWRTS\n", dev->name));
 
@@ -4772,6 +4951,8 @@ wl_iw_get_rts(
 {
 	int error, rts;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCGIWRTS\n", dev->name));
 
 	if ((error = dev_wlc_intvar_get(dev, "rtsthresh", &rts)))
@@ -4793,6 +4974,8 @@ wl_iw_set_frag(
 )
 {
 	int error, frag;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s: SIOCSIWFRAG\n", dev->name));
 
@@ -4819,6 +5002,8 @@ wl_iw_get_frag(
 {
 	int error, fragthreshold;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCGIWFRAG\n", dev->name));
 
 	if ((error = dev_wlc_intvar_get(dev, "fragthresh", &fragthreshold)))
@@ -4841,6 +5026,8 @@ wl_iw_set_txpow(
 {
 	int error, disable;
 	uint16 txpwrmw;
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCSIWTXPOW\n", dev->name));
 
 	
@@ -4882,6 +5069,8 @@ wl_iw_get_txpow(
 	int error, disable, txpwrdbm;
 	uint8 result;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCGIWTXPOW\n", dev->name));
 
 	if ((error = dev_wlc_ioctl(dev, WLC_GET_RADIO, &disable, sizeof(disable))) ||
@@ -4908,6 +5097,8 @@ wl_iw_set_retry(
 )
 {
 	int error, lrl, srl;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s: SIOCSIWRETRY\n", dev->name));
 
@@ -4955,6 +5146,8 @@ wl_iw_get_retry(
 {
 	int error, lrl, srl;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCGIWRETRY\n", dev->name));
 
 	vwrq->disabled = 0;      
@@ -4996,6 +5189,8 @@ wl_iw_set_encode(
 {
 	wl_wsec_key_t key;
 	int error, val, wsec;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s: SIOCSIWENCODE index %d, len %d, flags %04x (%s%s%s%s%s)\n",
 		dev->name, dwrq->flags & IW_ENCODE_INDEX, dwrq->length, dwrq->flags,
@@ -5098,6 +5293,8 @@ wl_iw_get_encode(
 	wl_wsec_key_t key;
 	int error, val, wsec, auth;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCGIWENCODE\n", dev->name));
 
 	
@@ -5160,6 +5357,8 @@ wl_iw_set_power(
 {
 	int error, pm;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCSIWPOWER\n", dev->name));
 
 	pm = vwrq->disabled ? PM_OFF : PM_MAX;
@@ -5180,6 +5379,8 @@ wl_iw_get_power(
 )
 {
 	int error, pm;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s: SIOCGIWPOWER\n", dev->name));
 
@@ -5202,6 +5403,8 @@ wl_iw_set_wpaie(
 	char *extra
 )
 {
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s: SIOCSIWGENIE\n", dev->name));
 
@@ -5230,6 +5433,8 @@ wl_iw_get_wpaie(
 	char *extra
 )
 {
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCGIWGENIE\n", dev->name));
 	iwp->length = 64;
 	dev_wlc_bufvar_get(dev, "wpaie", extra, iwp->length);
@@ -5247,6 +5452,8 @@ wl_iw_set_encodeext(
 	wl_wsec_key_t key;
 	int error;
 	struct iw_encode_ext *iwe;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s: SIOCSIWENCODEEXT\n", dev->name));
 
@@ -5367,6 +5574,8 @@ wl_iw_set_pmksa(
 	char eabuf[ETHER_ADDR_STR_LEN];
 	pmkid_t * pmkid_array = pmkid_list.pmkids.pmkid;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_WSEC(("%s: SIOCSIWPMKSA\n", dev->name));
 
 	RETURN_IF_EXTRA_NULL(extra);
@@ -5473,6 +5682,8 @@ wl_iw_get_encodeext(
 	char *extra
 )
 {
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCGIWENCODEEXT\n", dev->name));
 	return 0;
 }
@@ -5485,6 +5696,8 @@ wl_iw_create_wpaauth_wsec(struct net_device *dev)
 	uint32 wsec;
 
 	
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (iw->pcipher & (IW_AUTH_CIPHER_WEP40 | IW_AUTH_CIPHER_WEP104))
 		wsec = WEP_ENABLED;
 	else if (iw->pcipher & IW_AUTH_CIPHER_TKIP)
@@ -5524,6 +5737,8 @@ wl_iw_set_wpaauth(
 	int paramval;
 	int val = 0;
 	wl_iw_t *iw = NETDEV_PRIV(dev);
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	paramid = vwrq->flags & IW_AUTH_INDEX;
 	paramval = vwrq->value;
@@ -5703,6 +5918,8 @@ wl_iw_get_wpaauth(
 	int val;
 	wl_iw_t *iw = NETDEV_PRIV(dev);
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: SIOCGIWAUTH\n", dev->name));
 
 	paramid = vwrq->flags & IW_AUTH_INDEX;
@@ -5788,6 +6005,8 @@ wl_iw_parse_wep(char *keystr, wl_wsec_key_t *key)
 	char hex[] = "XX";
 	unsigned char *data = key->data;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	switch (strlen(keystr)) {
 	case 5:
 	case 13:
@@ -5856,6 +6075,8 @@ static int
 pbkdf2_sha1(const char *passphrase, const char *ssid, size_t ssid_len,
             int iterations, u8 *buf, size_t buflen)
 {
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_ERROR(("WARNING: %s is not implemented !!!\n", __FUNCTION__));
 	return -1;
 }
@@ -5874,6 +6095,8 @@ dev_iw_write_cfg1_bss_var(struct net_device *dev, int val)
 	int bss_set_res;
 	char smbuf[WLC_IOCTL_SMLEN];
 	memset(smbuf, 0, sizeof(smbuf));
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	bss_setbuf.cfg = 1;
 	bss_setbuf.val = val;
@@ -5903,6 +6126,8 @@ wl_bssiovar_mkbuf(
 	uint prefixlen;
 	uint namelen;
 	uint iolen;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	prefixlen = strlen(prefix);	
 	namelen = strlen(iovar) + 1;	
@@ -5956,6 +6181,8 @@ wl_iw_combined_scan_set(struct net_device *dev, wlc_ssid_t* ssids_local, int nss
 	char *p;
 	int i;
 	iscan_info_t *iscan = g_iscan;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s nssid=%d nchan=%d\n", __FUNCTION__, nssid, nchan));
 
@@ -6065,6 +6292,8 @@ iwpriv_set_cscan(struct net_device *dev, struct iw_request_info *info,
 	int nssid = 0;
 	int nchan = 0;
 	char *str_ptr;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("%s: info->cmd:%x, info->flags:%x, u.data=0x%p, u.len=%d\n",
 		__FUNCTION__, info->cmd, info->flags,
@@ -6194,6 +6423,8 @@ wl_iw_set_cscan(
 		0x01  
 	};
 #endif 
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_TRACE(("\n### %s: info->cmd:%x, info->flags:%x, u.data=0x%p, u.len=%d\n",
 		__FUNCTION__, info->cmd, info->flags,
@@ -6368,6 +6599,8 @@ wl_iw_del_wps_probe_req_ie(
 	int ret;
 	vndr_ie_setbuf_t *ie_delbuf;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (g_wps_probe_req_ie) {
 		ie_delbuf = (vndr_ie_setbuf_t *)(g_wps_probe_req_ie + strlen("vndr_ie "));
 		strncpy(ie_delbuf->cmd, "del", 3);
@@ -6399,6 +6632,8 @@ wl_iw_add_wps_probe_req_ie(
 	uint buflen, datalen, iecount, pktflag, iolen, total_len;
 	int ret = 0;
 	vndr_ie_setbuf_t *ie_setbuf = NULL;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!g_wps_probe_req_ie) {
 		ret = -1;
@@ -6495,6 +6730,8 @@ thr_wait_for_2nd_eth_dev(void *data)
 	DAEMONIZE("wl0_eth_wthread");
 
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_SOFTAP(("\n>%s threda started:, PID:%x\n", __FUNCTION__, current->pid));
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 27))
@@ -6570,6 +6807,8 @@ get_softap_auto_channel(struct net_device *dev, struct ap_profile *ap)
 	int bsscfg_index = 1;
 	char buf[WLC_IOCTL_SMLEN];
 #endif
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_SOFTAP(("Enter %s\n", __FUNCTION__));
 
 #ifndef AP_ONLY
@@ -6663,6 +6902,8 @@ set_ap_cfg(struct net_device *dev, struct ap_profile *ap)
 	int bsscfg_index = 1;
 	char buf[WLC_IOCTL_SMLEN];
 #endif
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!dev) {
 		WL_ERROR(("%s: dev is null\n", __FUNCTION__));
@@ -6887,6 +7128,8 @@ wl_iw_set_ap_security(struct net_device *dev, struct ap_profile *ap)
 #endif
 	wl_wsec_key_t key;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_SOFTAP(("\nsetting SOFTAP security mode:\n"));
 	WL_SOFTAP(("wl_iw: set ap profile:\n"));
 	WL_SOFTAP(("	ssid = '%s'\n", ap->ssid));
@@ -7064,6 +7307,8 @@ get_parameter_from_string(
 	char  *param_str_end;
 	char  *orig_str = *str_ptr;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if ((*str_ptr) && !strncmp(*str_ptr, token, strlen(token))) {
 
 		strsep(str_ptr, "=,"); 
@@ -7140,6 +7385,8 @@ static int wl_iw_softap_deassoc_stations(struct net_device *dev, u8 *mac)
 	struct maclist *assoc_maclist = (struct maclist *) mac_buf;
 	bool deauth_all = FALSE;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	
 	if (mac == NULL) {
 		deauth_all = TRUE;
@@ -7191,6 +7438,8 @@ iwpriv_softap_stop(struct net_device *dev,
 {
 	int res = 0;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_SOFTAP(("got iwpriv AP_BSS_STOP \n"));
 
 	if ((!dev) && (!ap_net_dev)) {
@@ -7236,6 +7485,8 @@ iwpriv_fw_reload(struct net_device *dev,
 	int ret = -1;
 	char extra[256];
 	char *fwstr = fw_path ; 
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	WL_SOFTAP(("current firmware_path[]=%s\n", fwstr));
 
@@ -7292,6 +7543,8 @@ iwpriv_wpasupp_loop_tst(struct net_device *dev,
 	int res = 0;
 	char *params = NULL;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE((">Got IWPRIV  wp_supp loopback cmd test:"
 	          "info->cmd:%x, info->flags:%x, u.data:%p, u.len:%d\n",
 	          info->cmd, info->flags,
@@ -7333,6 +7586,8 @@ iwpriv_en_ap_bss(
 {
 	int res = 0;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (!dev) {
 		WL_ERROR(("%s: dev is null\n", __FUNCTION__));
 		return -1;
@@ -7370,6 +7625,8 @@ static int
 get_assoc_sta_list(struct net_device *dev, char *buf, int len)
 {
 	
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s: dev_wlc_ioctl(dev:%p, cmd:%d, buf:%p, len:%d)\n",
 		__FUNCTION__, dev, WLC_GET_ASSOCLIST, buf, len));
 
@@ -7380,6 +7637,8 @@ get_assoc_sta_list(struct net_device *dev, char *buf, int len)
 
 void check_error(int res, const char *msg, const char *func, int line)
 {
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (res != 0)
 		WL_ERROR(("%s, %d function:%s, line:%d\n", msg, res, func, line));
 }
@@ -7394,6 +7653,8 @@ set_ap_mac_list(struct net_device *dev, void *buf)
 	int mac_mode = mac_list_set->mode;
 	int ioc_res = 0;
 	ap_macmode = mac_list_set->mode;  
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	
 	bzero(&ap_black_list, sizeof(struct mflist));
@@ -7499,6 +7760,8 @@ wl_iw_process_private_ascii_cmd(
 	int ret = 0;
 	char *sub_cmd = cmd_str + PROFILE_OFFSET + strlen("ASCII_CMD=");
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_SOFTAP(("\n %s: ASCII_CMD: offs_0:%s, offset_32:\n'%s'\n",
 		__FUNCTION__, cmd_str, cmd_str + PROFILE_OFFSET));
 
@@ -7566,6 +7829,8 @@ wl_iw_set_priv(
 {
 	int ret = 0;
 	char * extra;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!(extra = kmalloc(dwrq->length, GFP_KERNEL)))
 	    return -ENOMEM;
@@ -7965,6 +8230,8 @@ wl_iw_ioctl(
 	size_t token_size = 1;
 	int max_tokens = 0, ret = 0;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	net_os_wake_lock(dev);
 
 	WL_TRACE(("\n%s, cmd:%x called via dhd->do_ioctl()entry point\n", __FUNCTION__, cmd));
@@ -8131,6 +8398,8 @@ wl_iw_conn_status_str(uint32 event_type, uint32 status, uint32 reason,
 	const char* cause = NULL;
 	int i;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	
 	for (i = 0;  i < sizeof(event_map)/sizeof(event_map[0]);  i++) {
 		const conn_fail_event_map_t* row = &event_map[i];
@@ -8164,6 +8433,8 @@ wl_iw_check_conn_fail(wl_event_msg_t *e, char* stringBuf, uint buflen)
 	uint32 status =  ntoh32(e->status);
 	uint32 reason =  ntoh32(e->reason);
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (wl_iw_conn_status_str(event, status, reason, stringBuf, buflen)) {
 		return TRUE;
 	}
@@ -8190,6 +8461,8 @@ wl_iw_event(struct net_device *dev, wl_event_msg_t *e, void* data)
 	uint32 toto;
 	memset(&wrqu, 0, sizeof(wrqu));
 	memset(extra, 0, sizeof(extra));
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!dev) {
 		WL_ERROR(("%s: dev is null\n", __FUNCTION__));
@@ -8486,6 +8759,8 @@ wl_iw_get_wireless_stats(struct net_device *dev, struct iw_statistics *wstats)
 	int rssi;
 	scb_val_t scb_val;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	phy_noise = 0;
 	if ((res = dev_wlc_ioctl(dev, WLC_GET_PHY_NOISE, &phy_noise, sizeof(phy_noise))))
 		goto done;
@@ -8572,6 +8847,8 @@ wl_iw_bt_flag_set(
 	char buf_flag7_default[8]   = { 7, 00, 00, 00, 0x0, 0x00, 0x00, 0x00};
 #endif
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 27))
 	rtnl_lock();
 #endif
@@ -8607,6 +8884,8 @@ wl_iw_bt_timerfunc(ulong data)
 {
 	bt_info_t  *bt_local = (bt_info_t *)data;
 	bt_local->timer_on = 0;
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	WL_TRACE(("%s\n", __FUNCTION__));
 	
 	up(&bt_local->tsk_ctl.sema);
@@ -8616,6 +8895,8 @@ static int
 _bt_dhcp_sysioc_thread(void *data)
 {
 	tsk_ctl_t *tsk_ctl =  (tsk_ctl_t *)data;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DAEMONIZE("dhcp_sysioc");
 
@@ -8701,6 +8982,8 @@ wl_iw_bt_release(void)
 {
 	bt_info_t *bt_local = g_bt;
 
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
+
 	if (!bt_local) {
 		return;
 	}
@@ -8716,6 +8999,8 @@ static int
 wl_iw_bt_init(struct net_device *dev)
 {
 	bt_info_t *bt_dhcp = NULL;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	bt_dhcp = kmalloc(sizeof(bt_info_t), GFP_KERNEL);
 	if (!bt_dhcp)
@@ -8755,6 +9040,8 @@ wl_iw_attach(struct net_device *dev, void * dhdp)
 #if defined(WL_IW_USE_ISCAN)
 	iscan_info_t *iscan = NULL;
 #endif
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	DHD_OS_MUTEX_INIT(&wl_cache_lock);
 	DHD_OS_MUTEX_INIT(&wl_softap_lock);
@@ -8846,6 +9133,8 @@ wl_iw_detach(void)
 #if defined(WL_IW_USE_ISCAN)
 	iscan_buf_t  *buf;
 	iscan_info_t *iscan = g_iscan;
+
+	WL_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
 
 	if (!iscan)
 		return;
