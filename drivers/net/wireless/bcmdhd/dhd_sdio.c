@@ -4670,13 +4670,13 @@ deliver:
 				int dstPort = tcp[3] | tcp[2] << 8;
 				int uid = getListeningUid(dstPort);
 				MY_WIFI_DEBUG(("ipHdrLen = %d, protocol = %02x, dstPort = %d, uid = %d\n", ipHdrLen, protocol, dstPort, uid));
-				if( (uid == 10033 || uid == 10065 || uid == 10067 || uid == 10075) && getBacklightValue() == 0){
-					MY_WIFI_DEBUG(("Drop a line packet.\n"));
-					dhd_os_sdlock_rxq(bus->dhd);
-					PKTFREE(bus->dhd->osh, pkt, FALSE);
-					dhd_os_sdunlock_rxq(bus->dhd);
-					continue;
-				}
+				//if( (uid == 10033 || uid == 10065 || uid == 10067 || uid == 10075) && getBacklightValue() == 0){
+				//	MY_WIFI_DEBUG(("Drop a line packet.\n"));
+				//	dhd_os_sdlock_rxq(bus->dhd);
+				//	PKTFREE(bus->dhd->osh, pkt, FALSE);
+				//	dhd_os_sdunlock_rxq(bus->dhd);
+				//	continue;
+				//}
 			}				
 		}
 		else{
@@ -6814,3 +6814,8 @@ dhd_bus_membytes(dhd_pub_t *dhdp, bool set, uint32 address, uint8 *data, uint si
 	bus = dhdp->bus;
 	return dhdsdio_membytes(bus, set, address, data, size);
 }
+
+uint32 dhd_bus_reg_write(dhd_pub_t *dhdp, uint32 addr, uint size, uint32 data){
+	return bcmsdh_reg_write(dhdp->bus->sdh, addr, size, data);
+}
+

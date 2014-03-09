@@ -41,6 +41,7 @@
 #include <linux/cpu.h>
 #include <linux/notifier.h>
 #include <linux/rculist.h>
+#include <linux/gpio.h>
 
 #include <asm/uaccess.h>
 
@@ -786,7 +787,9 @@ static int have_callable_console(void)
  * See the vsnprintf() documentation for format string extensions over C99.
  */
 
-asmlinkage int printk(const char *fmt, ...)
+static unsigned long startTime = 0;
+
+asmlinkage int myPrintk(const char *fmt, ...)
 {
 	va_list args;
 	int r;
@@ -802,6 +805,36 @@ asmlinkage int printk(const char *fmt, ...)
 	va_start(args, fmt);
 	r = vprintk(fmt, args);
 	va_end(args);
+
+	return r;
+} 
+
+asmlinkage int printk(const char *fmt, ...)
+{
+	va_list args;
+	int r;
+
+	if(startTime == 0){
+		startTime = jiffies + HZ*60;
+	}
+
+#ifdef CONFIG_KGDB_KDB
+	if (unlikely(kdb_trap_printk)) {
+		va_start(args, fmt);
+		r = vkdb_printf(fmt, args);
+		va_end(args);
+		//if(time_after(jiffies, startTime)){
+		//	myPrintk("%s test value:%d time:%lu\n", __func__, gpio_get_value(2), jiffies);
+		//}
+		return r;
+	}
+#endif
+	va_start(args, fmt);
+	r = vprintk(fmt, args);
+	va_end(args);
+	//if(time_after(jiffies, startTime)){
+	//	myPrintk("%s test value:%d time:%lu\n", __func__, gpio_get_value(2), jiffies);
+	//}
 
 	return r;
 }

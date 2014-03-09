@@ -29,13 +29,17 @@
 #include <sdio.h>	/* SDIO Device and Protocol Specs */
 #include <bcmsdbus.h>	/* bcmsdh to/from specific controller APIs */
 #include <sdiovar.h>	/* to get msglevel bit values */
+#include <bcmdefs.h>
+#include <bcmdevs.h>
 
 #include <linux/sched.h>	/* request_irq() */
+#include <linux/time.h>
 
 #include <linux/mmc/core.h>
 #include <linux/mmc/card.h>
 #include <linux/mmc/sdio_func.h>
 #include <linux/mmc/sdio_ids.h>
+#include <linux/gpio.h>
 
 #if !defined(SDIO_VENDOR_ID_BROADCOM)
 #define SDIO_VENDOR_ID_BROADCOM		0x02d0
@@ -70,7 +74,13 @@
 
 #include <bcmsdh_sdmmc.h>
 
+#include <dngl_stats.h>
+#include <dhd.h>
 #include <dhd_dbg.h>
+#include <dhd_bus.h>
+#include <dhd_bta.h>
+
+
 
 #ifdef WL_CFG80211
 extern void wl_cfg80211_set_parent_dev(void *dev);
@@ -81,6 +91,7 @@ extern void sdioh_sdmmc_devintr_on(sdioh_info_t *sd);
 extern int dhd_os_check_wakelock(void *dhdp);
 extern int dhd_os_check_if_up(void *dhdp);
 extern void *bcmsdh_get_drvdata(void);
+extern uint32 dhd_bus_reg_write(dhd_pub_t *dhdp, uint32 addr, uint size, uint32 data);
 
 int sdio_function_init(void);
 void sdio_function_cleanup(void);
@@ -90,6 +101,9 @@ void sdio_function_cleanup(void);
 
 /* module param defaults */
 static int clockoverride = 0;
+static struct timespec lastTime;
+static bool first = true;
+static bool blocked = false;
 
 module_param(clockoverride, int, 0644);
 MODULE_PARM_DESC(clockoverride, "SDIO card clock override");
@@ -208,7 +222,20 @@ static int bcmsdh_sdmmc_suspend(struct device *pdev)
 		return ret;
 	}
 #if defined(OOB_INTR_ONLY)
-	bcmsdh_oob_intr_set(0);
+	if(blocked){
+		dhd_pub_t *dhdp;
+		dhdp = (dhd_pub_t *)bcmsdh_get_drvdata();
+		ret = dhd_bus_reg_write(dhdp, 0x18002020, 4, 0x40);
+		if (ret) {
+			printk("%s error.\n", __func__);
+			return ret;
+		}
+	}
+	else{
+		bcmsdh_oob_intr_set(0);
+	}
+	blocked = false;
+	printk("%s test gpio:%d value:%d\n", __func__, 2, gpio_get_value(2));
 #endif	/* defined(OOB_INTR_ONLY) */
 	dhd_mmc_suspend = TRUE;
 	smp_mb();
@@ -221,13 +248,41 @@ static int bcmsdh_sdmmc_resume(struct device *pdev)
 #if defined(OOB_INTR_ONLY)
 	struct sdio_func *func = dev_to_sdio_func(pdev);
 #endif
+	unsigned int irqNumber = 162;	
+	int gpioNumber = irq_to_gpio(irqNumber);
 	DHD_MYTRACE(("%s-%s\n", __FILE__, __FUNCTION__));
 
 	sd_trace(("%s Enter\n", __FUNCTION__));
 	dhd_mmc_suspend = FALSE;
 #if defined(OOB_INTR_ONLY)
-	if ((func->num == 2) && dhd_os_check_if_up(bcmsdh_get_drvdata()))
-		bcmsdh_oob_intr_set(1);
+	if ((func->num == 2) && dhd_os_check_if_up(bcmsdh_get_drvdata())){
+		printk("%s test gpio:%d value:%d\n", __func__, gpioNumber, gpio_get_value(gpioNumber));
+		struct timespec curTime;
+ 
+		if(first){
+			getnstimeofday(&lastTime);
+			first = false;
+		}
+		getnstimeofday(&curTime);
+		
+		printk("%s test lastTime:%lu curTime:%lu\n", __func__, lastTime.tv_sec, curTime.tv_sec);		
+	
+		if(curTime.tv_sec - lastTime.tv_sec < 1){
+			bcmsdh_oob_intr_set(1);
+			printk("%s test gpio:%d value:%d <\n", __func__, gpioNumber, gpio_get_value(gpioNumber));
+		}
+		else if(curTime.tv_sec - lastTime.tv_sec < 30 && gpio_get_value(gpioNumber) == 1){
+			blocked = true;
+			printk("%s test gpio:%d value:%d\n blocked:true", __func__, gpioNumber, gpio_get_value(gpioNumber));
+		}
+		else{
+			if(gpio_get_value(gpioNumber) == 1){
+				getnstimeofday(&lastTime);
+			}
+			bcmsdh_oob_intr_set(1);
+			printk("%s test gpio:%d value:%d >= lastTime:%lu\n", __func__, gpioNumber, gpio_get_value(gpioNumber), lastTime);
+		}
+	}
 #endif /* (OOB_INTR_ONLY) */
 
 	smp_mb();

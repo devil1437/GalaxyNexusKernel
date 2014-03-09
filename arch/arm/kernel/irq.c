@@ -36,6 +36,7 @@
 #include <linux/kallsyms.h>
 #include <linux/proc_fs.h>
 #include <linux/ftrace.h>
+#include <linux/time.h>
 
 #include <asm/system.h>
 #include <asm/mach/arch.h>
@@ -50,6 +51,7 @@
 #endif
 
 unsigned long irq_err_count;
+unsigned long time = 0;
 
 ATOMIC_NOTIFIER_HEAD(touch_watchdog_notifier_head);
 
@@ -76,31 +78,43 @@ int arch_show_interrupts(struct seq_file *p, int prec)
 asmlinkage void __exception_irq_entry
 asm_do_IRQ(unsigned int irq, struct pt_regs *regs)
 {
-	struct pt_regs *old_regs = set_irq_regs(regs);
-	struct irq_desc *desc = irq_to_desc(irq);
-
-//	printk("%s IRQ=%d\n", __FUNCTION__, desc->irq_data.irq);
-
-	irq_enter();
+	struct pt_regs *old_regs = set_irq_regs(regs); 
+	
+//	printk("%s test irq=%u\n", __FUNCTION__, irq);
 
 	/*
-	 * Some hardware gives randomly wrong interrupts.  Rather
-	 * than crashing, do something sensible.
+	 * The interrupt number from bcmsdh_sdmmc in there is 61.
+	 * Why the interrupt number is different from interrupt api?
+	 * http://stackoverflow.com/questions/15871048/the-irq-in-kernel-function-asm-do-irq-is-different-from-the-one-i-request-in-m
+	 * Because they are mapping in static way. We can use 61 to represent the interrupt from network card.
 	 */
-	if (unlikely(irq >= nr_irqs)) {
-		if (printk_ratelimit())
-			printk(KERN_WARNING "Bad IRQ%u\n", irq);
-		ack_bad_irq(irq);
-//	} else if(desc->irq_data.irq == 162) {
-		
-	} else {
-		generic_handle_irq(irq);
-	}
+//	if(irq == 61 && ( (jiffies-time)/HZ < 5 && (jiffies-time)/HZ > 1) ){
+//		printk("%s test block\n", __FUNCTION__);	
+//	} else {
+//		if(irq == 61 && (jiffies-time)/HZ >= 5){
+//			time = jiffies;
+//		}
 
-	/* AT91 specific workaround */
-	irq_finish(irq);
+		irq_enter();
 
-	irq_exit();
+		/*
+	 	 * Some hardware gives randomly wrong interrupts.  Rather
+	 	 * than crashing, do something sensible.
+	 	 */
+		if (unlikely(irq >= nr_irqs)) {
+			if (printk_ratelimit())
+				printk(KERN_WARNING "Bad IRQ%u\n", irq);
+			ack_bad_irq(irq);
+		} else {
+			generic_handle_irq(irq);
+		}
+
+		/* AT91 specific workaround */
+		irq_finish(irq);
+
+		irq_exit();
+//	}
+	
 	set_irq_regs(old_regs);
 }
 

@@ -176,22 +176,22 @@ irqreturn_t handle_irq_event(struct irq_desc *desc)
 	irqd_set(&desc->irq_data, IRQD_IRQ_INPROGRESS);
 	raw_spin_unlock(&desc->lock);
 
-//	if(j == 0){
-//		j = jiffies;
-//	}
-//
+	if(desc->irq_data.irq == 162){		
+		printk("%s test irq=162\n",  __FILE__);
+	}
+
 //	if(desc->irq_data.irq == 162 && (jiffies-j)/HZ < 5){
-//		printk("%s IRQ=162 time=%d\n", __FILE__, (jiffies-j)/HZ);
-//		ret = IRQ_HANDLED;
+//		printk("%s IRQ=162 time=%lu jiffies=%lu j=%lu HZ=%d\n", __FILE__, (jiffies-j)/HZ, jiffies, j, HZ);
+//		ret = IRQ_NONE;
 //	}
-	if(desc->irq_data.irq == 162){
-		printk("%s IRQ=162 time=%lu jiffies=%lu j=%lu HZ=%d\n", __FILE__, (jiffies-j)/HZ, jiffies, j, HZ);
-		j = jiffies;	
+//	else if(desc->irq_data.irq == 162){
+//		printk("%s IRQ=162 time=%lu jiffies=%lu j=%lu HZ=%d\n", __FILE__, (jiffies-j)/HZ, jiffies, j, HZ);
+//		j = jiffies;	
+//		ret = handle_irq_event_percpu(desc, action);
+//	}
+//	else{
 		ret = handle_irq_event_percpu(desc, action);
-	}
-	else{
-		ret = handle_irq_event_percpu(desc, action);
-	}
+//	}
 
 	raw_spin_lock(&desc->lock);
 	irqd_clear(&desc->irq_data, IRQD_IRQ_INPROGRESS);

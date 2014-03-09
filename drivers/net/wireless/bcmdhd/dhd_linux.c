@@ -1837,6 +1837,7 @@ dhd_dpc_thread(void *data)
 			/* Call bus dpc unless it indicated down (then clean stop) */
 			if (dhd->pub.busstate != DHD_BUS_DOWN) {
 				if (dhd_bus_dpc(dhd->pub.bus)) {
+					printk("%s get a soft interrupt.\n", __FUNCTION__);
 					up(&tsk->sema);
 				}
 				else {
@@ -2826,6 +2827,7 @@ dhd_attach(osl_t *osh, struct dhd_bus *bus, uint bus_hdrlen)
 
 #ifdef DHDTHREAD
 	/* Initialize thread based operation and lock */
+	printk("%s tasklet. ifdef DHDTHREAD.\n", __FUNCTION__);
 	if ((dhd_watchdog_prio >= 0) && (dhd_dpc_prio >= 0)) {
 		dhd->threads_only = TRUE;
 	}
@@ -2843,9 +2845,11 @@ dhd_attach(osl_t *osh, struct dhd_bus *bus, uint bus_hdrlen)
 	/* Set up the bottom half handler */
 	if (dhd_dpc_prio >= 0) {
 		/* Initialize DPC thread */
+		printk("%s tasklet. dhd_dpc_prio>=0.\n", __FUNCTION__);
 		PROC_START(dhd_dpc_thread, dhd, &dhd->thr_dpc_ctl, 0);
 	} else {
 		/*  use tasklet for dpc */
+		printk("%s tasklet. dhd_dpc_prio<0.\n", __FUNCTION__);
 		tasklet_init(&dhd->tasklet, dhd_dpc, (ulong)dhd);
 		dhd->thr_dpc_ctl.thr_pid = -1;
 	}

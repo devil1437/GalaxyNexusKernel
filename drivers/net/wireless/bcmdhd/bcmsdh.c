@@ -495,7 +495,9 @@ bcmsdh_reg_write(void *sdh, uint32 addr, uint size, uint32 data)
 	int err = 0;
 
 	DHD_MYTRACE(("%s_%s\n", __FILE__, __FUNCTION__));
-
+	DHD_MYTRACE(("%s:fun = 1, addr = 0x%x, uint%ddata = 0x%x\n",
+	             __FUNCTION__, addr, size*8, data));
+	
 	BCMSDH_INFO(("%s:fun = 1, addr = 0x%x, uint%ddata = 0x%x\n",
 	             __FUNCTION__, addr, size*8, data));
 

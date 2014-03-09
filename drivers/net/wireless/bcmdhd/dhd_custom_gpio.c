@@ -113,6 +113,7 @@ int dhd_customer_oob_irq_map(unsigned long *irq_flags_ptr)
 #elif defined CUSTOMER_HW3
 	gpio_request(dhd_oob_gpio_num, "oob irq");
 	host_oob_irq = gpio_to_irq(dhd_oob_gpio_num);
+	printk("test %d %d\n", dhd_oob_gpio_num, host_oob_irq);
 	gpio_direction_input(dhd_oob_gpio_num);
 #endif /* CUSTOMER_HW */
 #endif /* CUSTOMER_HW2 */
